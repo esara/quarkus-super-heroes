@@ -11,6 +11,7 @@
     <modules>
         <module>super-heroes/ui-super-heroes</module>
         <module>super-heroes/load-super-heroes</module>
+        <module>super-heroes/rest-villains</module>
     </modules>
     <build>
         <plugins>
