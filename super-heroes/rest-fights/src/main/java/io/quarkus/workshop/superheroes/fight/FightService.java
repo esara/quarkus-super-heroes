@@ -4,6 +4,7 @@ import io.quarkus.workshop.superheroes.fight.client.Hero;
 import io.quarkus.workshop.superheroes.fight.client.HeroProxy;
 import io.quarkus.workshop.superheroes.fight.client.Villain;
 import io.quarkus.workshop.superheroes.fight.client.VillainProxy;
+import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
@@ -35,13 +36,35 @@ public class FightService {
     }
 
     @RestClient VillainProxy villainProxy;
+    @Fallback(fallbackMethod = "fallbackRandomVillain")
     public Villain findRandomVillain() {
         return villainProxy.findRandomVillain();
     }
 
     @RestClient HeroProxy heroProxy;
+    @Fallback(fallbackMethod = "fallbackRandomHero")
     public Hero findRandomHero() {
         return heroProxy.findRandomHero();
+    }
+
+    public Hero fallbackRandomHero() {
+        logger.warn("Falling back on Hero");
+        Hero hero = new Hero();
+        hero.name = "Fallback hero";
+        hero.picture = "https://dummyimage.com/280x380/1e8fff/ffffff&text=Fallback+Hero";
+        hero.powers = "Fallback hero powers";
+        hero.level = 1;
+        return hero;
+    }
+
+    public Villain fallbackRandomVillain() {
+        logger.warn("Falling back on Villain");
+        Villain villain = new Villain();
+        villain.name = "Fallback villain";
+        villain.picture = "https://dummyimage.com/280x380/b22222/ffffff&text=Fallback+Villain";
+        villain.powers = "Fallback villain powers";
+        villain.level = 42;
+        return villain;
     }
 
     public Fighters findRandomFighters() {
