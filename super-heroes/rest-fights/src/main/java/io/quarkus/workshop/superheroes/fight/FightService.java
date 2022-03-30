@@ -1,5 +1,6 @@
 package io.quarkus.workshop.superheroes.fight;
-
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import io.quarkus.workshop.superheroes.fight.client.Hero;
 import io.quarkus.workshop.superheroes.fight.client.HeroProxy;
 import io.quarkus.workshop.superheroes.fight.client.Villain;
@@ -34,6 +35,8 @@ public class FightService {
     public Fight findFightById(Long id) {
         return Fight.findById(id);
     }
+
+    @Channel("fights") Emitter<Fight> emitter;
 
     @RestClient VillainProxy villainProxy;
     @Fallback(fallbackMethod = "fallbackRandomVillain")
@@ -96,7 +99,7 @@ public class FightService {
 
         fight.fightDate = Instant.now();
         fight.persist();
-
+        emitter.send(fight).toCompletableFuture().join();
         return fight;
     }
 
