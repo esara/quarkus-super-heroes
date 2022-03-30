@@ -56,10 +56,10 @@ public class FightResource {
         return service.persistFight(fighters);
     }
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("/hello")
-    public String hello() {
-        return "Hello Fight Resource";
-    }
+//    @GET
+//    @Produces(MediaType.TEXT_PLAIN)
+//    @Path("/hello")
+//    public String hello() {
+//        return "Hello Fight Resource";
+//    }
 }

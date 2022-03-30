@@ -2,6 +2,8 @@ package io.quarkus.workshop.superheroes.fight;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.workshop.superheroes.fight.client.Hero;
+import io.quarkus.workshop.superheroes.fight.client.MockHeroProxy;
+import io.quarkus.workshop.superheroes.fight.client.MockVillainProxy;
 import io.quarkus.workshop.superheroes.fight.client.Villain;
 import io.restassured.common.mapper.TypeRef;
 import org.hamcrest.core.Is;
@@ -46,14 +48,14 @@ public class FightResourceTest {
             .statusCode(OK.getStatusCode());
     }
 
-    @Test
-    public void testHelloEndpoint() {
-        given()
-            .when().get("/api/fights/hello")
-            .then()
-            .statusCode(200)
-            .body(is("Hello Fight Resource"));
-    }
+//    @Test
+//    public void testHelloEndpoint() {
+//        given()
+//            .when().get("/api/fights/hello")
+//            .then()
+//            .statusCode(200)
+//            .body(is("Hello Fight Resource"));
+//    }
 
     @Test
     void shouldNotGetUnknownFight() {
@@ -136,6 +138,21 @@ public class FightResourceTest {
             .statusCode(OK.getStatusCode())
             .extract().body().as(getFightTypeRef());
         assertEquals(NB_FIGHTS + 1, fights.size());
+    }
+
+    @Test
+    void shouldGetRandomFighters() {
+        given()
+            .when().get("/api/fights/randomfighters")
+            .then()
+            .statusCode(OK.getStatusCode())
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .body("hero.name", Is.is(MockHeroProxy.DEFAULT_HERO_NAME))
+            .body("hero.picture", Is.is(MockHeroProxy.DEFAULT_HERO_PICTURE))
+            .body("hero.level", Is.is(MockHeroProxy.DEFAULT_HERO_LEVEL))
+            .body("villain.name", Is.is(MockVillainProxy.DEFAULT_VILLAIN_NAME))
+            .body("villain.picture", Is.is(MockVillainProxy.DEFAULT_VILLAIN_PICTURE))
+            .body("villain.level", Is.is(MockVillainProxy.DEFAULT_VILLAIN_LEVEL));
     }
 
     private TypeRef<List<Fight>> getFightTypeRef() {
