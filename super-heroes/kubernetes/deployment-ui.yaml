@@ -3,28 +3,28 @@ apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   labels:
-      app: "quarkus-workshop-villain"
+      app: "quarkus-workshop-ui"
       version: "01"
       group: "super-heroes"
-  name: "quarkus-workshop-villain"
+  name: "quarkus-workshop-ui"
 spec:
   replicas: 1
   selector:
       matchLabels:
-          app: "quarkus-workshop-villain"
+          app: "quarkus-workshop-ui"
           version: "01"
           group: "super-heroes"
   template:
       metadata:
           labels:
-              app: "quarkus-workshop-villain"
+              app: "quarkus-workshop-ui"
               version: "01"
               group: "super-heroes"
       spec:
           containers:
-          - image: "esara/quarkus-workshop-villain"
+          - image: "esara/quarkus-workshop-ui"
             imagePullPolicy: "IfNotPresent"
-            name: "quarkus-workshop-villain"
+            name: "quarkus-workshop-hero"
             ports:
               - containerPort: 8080
             env:
@@ -35,28 +35,28 @@ spec:
                 - name: QUARKUS_HTTP_PORT
                   valueFrom:
                     configMapKeyRef:
-                      name: villain-config
+                      name: ui-config
                       key: port
-                - name: QUARKUS_DATASOURCE_JDBC_URL
+                - name: BASE_PATH
                   valueFrom:
                     configMapKeyRef:
-                      name: villain-config
-                      key: database
+                      name: ui-config
+                      key: basePath
 ---
 apiVersion: "v1"
 kind: "Service"
 metadata:
     labels:
-        app: "quarkus-workshop-villain"
+        app: "quarkus-workshop-ui"
         version: "01"
         group: "super-heroes"
-    name: "quarkus-workshop-villain"
+    name: "quarkus-workshop-ui"
 spec:
     ports:
         - name: "http"
           port: 8080
     selector:
-        app: "quarkus-workshop-villain"
+        app: "quarkus-workshop-ui"
         version: "01"
         group: "super-heroes"
-    type: "ClusterIP"
+    type: "LoadBalancer"

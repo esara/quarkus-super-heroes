@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native-distroless -t quarkus/rest-villains .
+# docker build -f src/main/docker/Dockerfile.native-distroless -t esara/quarkus-workshop-villain .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/rest-villains
+# docker run -i --rm -p 8080:8080 esara/quarkus-workshop-villain
 #
 ###
 FROM quay.io/quarkus/quarkus-distroless-image:1.0

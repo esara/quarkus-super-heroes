@@ -1,3 +1,4 @@
+-- psql -U superman villain
 INSERT INTO villain(id, name, otherName, picture, powers, level)
 VALUES (nextval('hibernate_sequence'), 'Buuccolo', 'Majin Buu', 'https://www.superherodb.com/pictures2/portraits/11/050/15355.jpg', 'Accelerated Healing, Adaptation, Agility, Flight, Immortality, Intelligence, Invulnerability, Reflexes, Self-Sustenance, Size Changing, Spatial Awareness, Stamina, Stealth, Super Breath, Super Speed, Super Strength, Teleportation', 22);
 INSERT INTO villain(id, name, otherName, picture, powers, level)

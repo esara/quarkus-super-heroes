@@ -3,28 +3,28 @@ apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   labels:
-      app: "quarkus-workshop-villain"
+      app: "quarkus-workshop-stat"
       version: "01"
       group: "super-heroes"
-  name: "quarkus-workshop-villain"
+  name: "quarkus-workshop-stat"
 spec:
   replicas: 1
   selector:
       matchLabels:
-          app: "quarkus-workshop-villain"
+          app: "quarkus-workshop-stat"
           version: "01"
           group: "super-heroes"
   template:
       metadata:
           labels:
-              app: "quarkus-workshop-villain"
+              app: "quarkus-workshop-stat"
               version: "01"
               group: "super-heroes"
       spec:
           containers:
-          - image: "esara/quarkus-workshop-villain"
+          - image: "esara/quarkus-workshop-statistic"
             imagePullPolicy: "IfNotPresent"
-            name: "quarkus-workshop-villain"
+            name: "quarkus-workshop-stat"
             ports:
               - containerPort: 8080
             env:
@@ -35,28 +35,28 @@ spec:
                 - name: QUARKUS_HTTP_PORT
                   valueFrom:
                     configMapKeyRef:
-                      name: villain-config
+                      name: stat-config
                       key: port
-                - name: QUARKUS_DATASOURCE_JDBC_URL
+                - name: KAFKA_BOOTSTRAP_SERVERS
                   valueFrom:
                     configMapKeyRef:
-                      name: villain-config
-                      key: database
+                      name: stat-config
+                      key: kafka
 ---
 apiVersion: "v1"
 kind: "Service"
 metadata:
     labels:
-        app: "quarkus-workshop-villain"
+        app: "quarkus-workshop-stat"
         version: "01"
         group: "super-heroes"
-    name: "quarkus-workshop-villain"
+    name: "quarkus-workshop-stat"
 spec:
     ports:
         - name: "http"
           port: 8080
     selector:
-        app: "quarkus-workshop-villain"
+        app: "quarkus-workshop-stat"
         version: "01"
         group: "super-heroes"
     type: "ClusterIP"

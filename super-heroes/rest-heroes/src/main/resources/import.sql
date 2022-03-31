@@ -1,3 +1,4 @@
+-- psql -U superman heroes
 INSERT INTO hero(id, name, otherName, picture, powers, level)
 VALUES (nextval('hibernate_sequence'), 'Chewbacca', '', 'https://www.superherodb.com/pictures2/portraits/10/050/10466.jpg', 'Agility, Longevity, Marksmanship, Natural Weapons, Stealth, Super Strength, Weapons Master', 5);
 INSERT INTO hero(id, name, otherName, picture, powers, level)

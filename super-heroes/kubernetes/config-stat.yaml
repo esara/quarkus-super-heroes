@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: stat-config
+data:
+    kafka: "super-heroes-kafka-brokers:9092"
+    port: "8080"

@@ -1,14 +1,13 @@
 apiVersion: postgresql.dev4devs.com/v1alpha1
 kind: Database
 metadata:
-    name: fights-database
-    namespace: quarkus-workshop
+    name: fights
 spec:
     databaseCpu: 30m
     databaseCpuLimit: 60m
     databaseMemoryLimit: 512Mi
     databaseMemoryRequest: 128Mi
-    databaseName: fight-database
+    databaseName: fight
     databaseNameKeyEnvVar: POSTGRESQL_DATABASE
     databasePassword: superfight
     databasePasswordKeyEnvVar: POSTGRESQL_PASSWORD

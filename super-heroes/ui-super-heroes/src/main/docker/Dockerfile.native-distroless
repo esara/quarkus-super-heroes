@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native-distroless -t esara/quarkus-workshop-fight .
+# docker build -f src/main/docker/Dockerfile.native-distroless -t esara/quarkus-workshop-ui .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 esara/quarkus-workshop-fight
+# docker run -i --rm -p 8080:8080 esara/quarkus-workshop-ui
 #
 ###
 FROM quay.io/quarkus/quarkus-distroless-image:1.0

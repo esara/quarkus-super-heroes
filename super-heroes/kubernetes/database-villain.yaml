@@ -1,14 +1,13 @@
 apiVersion: postgresql.dev4devs.com/v1alpha1
 kind: Database
 metadata:
-    name: villains-database
-    namespace: quarkus-workshop
+    name: villains
 spec:
     databaseCpu: 30m
     databaseCpuLimit: 60m
     databaseMemoryLimit: 512Mi
     databaseMemoryRequest: 128Mi
-    databaseName: villains-database
+    databaseName: villain
     databaseNameKeyEnvVar: POSTGRESQL_DATABASE
     databasePassword: superbad
     databasePasswordKeyEnvVar: POSTGRESQL_PASSWORD

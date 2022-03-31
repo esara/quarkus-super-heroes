@@ -1,10 +1,9 @@
-apiVersion: kafka.strimzi.io/v1beta1
+apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
   name: fights
   labels:
-    strimzi.io/cluster: my-kafka
-  namespace: quarkus-workshop
+    strimzi.io/cluster: super-heroes
 spec:
   partitions: 1
   replicas: 3
