@@ -3,5 +3,4 @@ kind: ConfigMap
 metadata:
     name: ui-config
 data:
-    basePath: "http://quarkus-workshop-fight:8080"
     port: "8080"

@@ -26,7 +26,7 @@ event-statistics:
 ui-super-heroes:
 	cd super-heroes/$@; mvn install -Pbuild-ui
 	cd super-heroes/$@; ./node_modules/.bin/ng build --configuration production --base-href "."
-	export DEST=src/main/resources/META-INF/resources; cd super-heroes/$@; rm -Rf ${DEST}; cp -R dist/* ${DEST}
+	export DEST=src/main/resources/META-INF/resources; cd super-heroes/$@; rm -Rf $${DEST}; cp -R dist/* $${DEST}
 	cd super-heroes/$@; mvn package
 	cd super-heroes/$@; docker build -f src/main/docker/Dockerfile.jvm -t esara/quarkus-workshop-ui .
 
@@ -34,4 +34,4 @@ load-super-heroes:
 	kubectl port-forward svc/quarkus-workshop-fight 8082:8080 &
 	kubectl port-forward svc/quarkus-workshop-hero 8083:8080 &
 	kubectl port-forward svc/quarkus-workshop-villain 8084:8080 &
-	cd super-heroes/$@; mvn exec:java
+	cd super-heroes/$@; mvn compile; mvn exec:java

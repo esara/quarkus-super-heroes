@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Random;
 
@@ -18,9 +16,15 @@ import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.CREATED;
+import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -39,7 +43,7 @@ public class HeroResourceTest {
     private static final int DEFAULT_LEVEL = 42;
     private static final int UPDATED_LEVEL = 43;
 
-    private static final int NB_HEROES = 3;
+    private static final int NB_HEROES = 951;
     private static String heroId;
 
     @Test
@@ -51,14 +55,14 @@ public class HeroResourceTest {
             .statusCode(OK.getStatusCode());
     }
 
-//    @Test
-//    public void testHelloEndpoint() {
-//        given()
-//            .when().get("/api/heroes/hello")
-//            .then()
-//            .statusCode(200)
-//            .body(is("Hello Hero Resource"));
-//    }
+    @Test
+    public void testHelloEndpoint() {
+        given()
+            .when().get("/api/heroes/hello")
+            .then()
+            .statusCode(200)
+            .body(is("Hello Hero Resource"));
+    }
 
     @Test
     void shouldNotGetUnknownHero() {

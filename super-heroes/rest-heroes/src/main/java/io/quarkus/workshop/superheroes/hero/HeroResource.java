@@ -11,16 +11,18 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestPath;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.List;
 
-import static javax.ws.rs.core.MediaType.*;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/api/heroes")
 @Tag(name = "heroes")
+@ApplicationScoped
 public class HeroResource {
 
     Logger logger;
@@ -107,11 +109,11 @@ public class HeroResource {
             .replaceWith(Response.noContent().build());
     }
 
-//    @GET
-//    @Path("/hello")
-//    @Produces(MediaType.TEXT_PLAIN)
-//    @Tag(name = "hello")
-//    public String hello() {
-//        return "Hello Hero Resource";
-//    }
+    @GET
+    @Path("/hello")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Tag(name = "hello")
+    public String hello() {
+        return "Hello Hero Resource";
+    }
 }

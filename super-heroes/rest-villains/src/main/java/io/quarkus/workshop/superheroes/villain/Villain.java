@@ -11,7 +11,6 @@ import java.util.Random;
 
 @Entity
 public class Villain extends PanacheEntity {
-
     @NotNull
     @Size(min = 3, max = 50)
     public String name;
@@ -21,27 +20,41 @@ public class Villain extends PanacheEntity {
     @NotNull
     @Min(1)
     public int level;
+
     public String picture;
 
     @Column(columnDefinition = "TEXT")
     public String powers;
-
-    @Override
-    public String toString() {
-        return "Villain{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", otherName='" + otherName + '\'' +
-            ", level=" + level +
-            ", picture='" + picture + '\'' +
-            ", powers='" + powers + '\'' +
-            '}';
-    }
 
     public static Villain findRandom() {
         long countVillains = count();
         Random random = new Random();
         int randomVillain = random.nextInt((int) countVillains);
         return findAll().page(randomVillain, 1).firstResult();
+    }
+
+    @Override
+    /* prettier-ignore */
+    public String toString() {
+        return (
+            "Villain{" +
+            "id=" +
+            id +
+            ", name='" +
+            name +
+            '\'' +
+            ", otherName='" +
+            otherName +
+            '\'' +
+            ", level=" +
+            level +
+            ", picture='" +
+            picture +
+            '\'' +
+            ", powers='" +
+            powers +
+            '\'' +
+            '}'
+        );
     }
 }

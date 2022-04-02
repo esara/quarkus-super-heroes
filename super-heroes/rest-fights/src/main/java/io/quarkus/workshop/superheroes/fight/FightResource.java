@@ -4,23 +4,27 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.jboss.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
 import java.util.List;
 
-import static javax.ws.rs.core.MediaType.*;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/api/fights")
 @Produces(APPLICATION_JSON)
+@ApplicationScoped
 public class FightResource {
 
-    @Inject Logger logger;
+    @Inject
+    Logger logger;
 
     @Inject
     FightService service;
@@ -40,6 +44,7 @@ public class FightResource {
     @Path("/randomfighters")
     @Timeout(500)
     public Response getRandomFighters() {
+        veryLongProcess();
         Fighters fighters = service.findRandomFighters();
         logger.debug("Get random fighters " + fighters);
         return Response.ok(fighters).build();
@@ -70,10 +75,10 @@ public class FightResource {
         return service.persistFight(fighters);
     }
 
-//    @GET
-//    @Produces(MediaType.TEXT_PLAIN)
-//    @Path("/hello")
-//    public String hello() {
-//        return "Hello Fight Resource";
-//    }
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/hello")
+    public String hello() {
+        return "Hello Fight Resource";
+    }
 }

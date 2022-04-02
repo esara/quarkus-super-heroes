@@ -57,6 +57,19 @@ spec:
                       configMapKeyRef:
                           name: fight-config
                           key: kafka
+                livenessProbe:
+                  httpGet:
+                      path: /q/health/live
+                      port: 8080
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                readinessProbe:
+                  httpGet:
+                      path: /q/health/ready
+                      port: 8080
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+
 ---
 apiVersion: "v1"
 kind: "Service"

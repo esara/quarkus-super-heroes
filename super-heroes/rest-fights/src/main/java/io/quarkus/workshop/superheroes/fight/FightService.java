@@ -1,11 +1,13 @@
 package io.quarkus.workshop.superheroes.fight;
-import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.eclipse.microprofile.reactive.messaging.Emitter;
+
+
 import io.quarkus.workshop.superheroes.fight.client.Hero;
 import io.quarkus.workshop.superheroes.fight.client.HeroProxy;
 import io.quarkus.workshop.superheroes.fight.client.Villain;
 import io.quarkus.workshop.superheroes.fight.client.VillainProxy;
 import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
@@ -24,9 +26,18 @@ import static javax.transaction.Transactional.TxType.SUPPORTS;
 @Transactional(SUPPORTS)
 public class FightService {
 
-    @Inject Logger logger;
+    @Inject
+    Logger logger;
+
+    @RestClient
+    HeroProxy heroProxy;
+    @RestClient
+    VillainProxy villainProxy;
 
     private final Random random = new Random();
+
+    @Channel("fights")
+    Emitter<Fight> emitter;
 
     public List<Fight> findAllFights() {
         return Fight.listAll();
@@ -36,18 +47,23 @@ public class FightService {
         return Fight.findById(id);
     }
 
-    @Channel("fights") Emitter<Fight> emitter;
-
-    @RestClient VillainProxy villainProxy;
-    @Fallback(fallbackMethod = "fallbackRandomVillain")
-    public Villain findRandomVillain() {
-        return villainProxy.findRandomVillain();
+    Fighters findRandomFighters() {
+        Hero hero = findRandomHero();
+        Villain villain = findRandomVillain();
+        Fighters fighters = new Fighters();
+        fighters.hero = hero;
+        fighters.villain = villain;
+        return fighters;
     }
 
-    @RestClient HeroProxy heroProxy;
     @Fallback(fallbackMethod = "fallbackRandomHero")
-    public Hero findRandomHero() {
+    Hero findRandomHero() {
         return heroProxy.findRandomHero();
+    }
+
+    @Fallback(fallbackMethod = "fallbackRandomVillain")
+    Villain findRandomVillain() {
+        return villainProxy.findRandomVillain();
     }
 
     public Hero fallbackRandomHero() {
@@ -70,16 +86,6 @@ public class FightService {
         return villain;
     }
 
-    public Fighters findRandomFighters() {
-        Hero hero = findRandomHero();
-        Villain villain = findRandomVillain();
-        Fighters fighters = new Fighters();
-        fighters.hero = hero;
-        fighters.villain = villain;
-        return fighters;
-    }
-
-
     @Transactional(REQUIRED)
     public Fight persistFight(Fighters fighters) {
         // Amazingly fancy logic to determine the winner...
@@ -99,7 +105,10 @@ public class FightService {
 
         fight.fightDate = Instant.now();
         fight.persist();
+
+        logger.info("Fight sent to statistics");
         emitter.send(fight).toCompletableFuture().join();
+
         return fight;
     }
 
