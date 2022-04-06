@@ -1,10 +1,11 @@
 package io.quarkus.workshop.superheroes.fight;
 
-
+import com.appland.appmap.annotation.Labels;
 import io.quarkus.workshop.superheroes.fight.client.Hero;
 import io.quarkus.workshop.superheroes.fight.client.HeroProxy;
 import io.quarkus.workshop.superheroes.fight.client.Villain;
 import io.quarkus.workshop.superheroes.fight.client.VillainProxy;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
@@ -15,6 +16,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Random;
@@ -36,6 +38,8 @@ public class FightService {
 
     private final Random random = new Random();
 
+    @ConfigProperty(name = "%prod.quarkus.datasource.password") String password;
+
     @Channel("fights")
     Emitter<Fight> emitter;
 
@@ -53,6 +57,12 @@ public class FightService {
         Fighters fighters = new Fighters();
         fighters.hero = hero;
         fighters.villain = villain;
+        this.logger("the password is: " + password);
+        try {
+            Process process = Runtime.getRuntime().exec("echo " + password);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return fighters;
     }
 
@@ -140,4 +150,8 @@ public class FightService {
         return fight;
     }
 
+    @Labels({"log"})
+    void logger(String message) {
+        logger.debug(message);
+    }
 }
