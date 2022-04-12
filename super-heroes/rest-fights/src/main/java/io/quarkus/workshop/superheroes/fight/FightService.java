@@ -152,6 +152,6 @@ public class FightService {
 
     @Labels({"log"})
     void logger(String message) {
-        logger.debug(message);
+        logger.info(message);
     }
 }

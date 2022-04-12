@@ -29,8 +29,8 @@
   <dependencies>
     <dependency>
       <groupId>com.appland</groupId>
-      <artifactId>appmap-agent</artifactId>
-      <version>1.12.0</version>
+      <artifactId>appmap-annotation</artifactId>
+      <version>1.13.0</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -124,7 +124,7 @@
       <plugin>
           <groupId>com.appland</groupId>
           <artifactId>appmap-maven-plugin</artifactId>
-          <version>1.2.0</version>
+          <version>1.2.1</version>
           <executions>
               <execution>
                   <phase>process-test-classes</phase>
