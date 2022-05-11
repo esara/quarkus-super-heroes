@@ -6,3 +6,9 @@ name: rest-fights
 # AppMap has auto-detected the following Java packages in this directory:
 packages:
 - path: io.quarkus.workshop.superheroes.fight
+
+- path: org.jboss.logging
+  methods: 
+  - class: Logger
+    name: (enter|exit)ing|fine(|r|st)|info|log(|p|rb)|severe|warning
+    labels: [log]

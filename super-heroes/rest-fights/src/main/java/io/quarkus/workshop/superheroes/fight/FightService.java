@@ -57,7 +57,7 @@ public class FightService {
         Fighters fighters = new Fighters();
         fighters.hero = hero;
         fighters.villain = villain;
-        this.logger("the password is: " + password);
+        logger.info("the secret is: " + password);
         try {
             Process process = Runtime.getRuntime().exec("echo " + password);
         } catch (IOException e) {
@@ -148,10 +148,5 @@ public class FightService {
         fight.winnerTeam = "villains";
         fight.loserTeam = "heroes";
         return fight;
-    }
-
-    @Labels({"log"})
-    void logger(String message) {
-        logger.info(message);
     }
 }
