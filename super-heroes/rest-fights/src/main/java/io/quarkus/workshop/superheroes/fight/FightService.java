@@ -149,4 +149,9 @@ public class FightService {
         fight.loserTeam = "heroes";
         return fight;
     }
+
+    @Labels({"log"})
+    void logger(String message) {
+        logger.info(message);
+    }
 }
