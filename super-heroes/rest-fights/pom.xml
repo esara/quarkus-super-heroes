@@ -13,7 +13,10 @@
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
     <quarkus.platform.version>2.7.5.Final</quarkus.platform.version>
-    <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+    <surefire-plugin.version>3.0.0-M6</surefire-plugin.version>
+    <appmap-version>
+      1.14.1
+    </appmap-version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -30,7 +33,7 @@
     <dependency>
       <groupId>com.appland</groupId>
       <artifactId>appmap-annotation</artifactId>
-      <version>1.13.0</version>
+      <version>${appmap-version}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
