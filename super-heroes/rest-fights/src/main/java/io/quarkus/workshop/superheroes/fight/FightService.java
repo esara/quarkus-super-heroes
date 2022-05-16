@@ -38,7 +38,7 @@ public class FightService {
 
     private final Random random = new Random();
 
-    @ConfigProperty(name = "%prod.quarkus.datasource.password") 
+    @ConfigProperty(name = "%prod.quarkus.datasource.password")
     String password;
 
     @Labels({"secret"})
@@ -156,8 +156,4 @@ public class FightService {
         return fight;
     }
 
-    @Labels({"log"})
-    void logger(String message) {
-        logger.info(message);
-    }
 }

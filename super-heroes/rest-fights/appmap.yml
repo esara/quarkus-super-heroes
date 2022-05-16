@@ -8,7 +8,7 @@ packages:
 - path: io.quarkus.workshop.superheroes.fight
 
 - path: org.jboss.logging
-  methods: 
+  methods:
   - class: Logger
     name: (enter|exit)ing|fine(|r|st)|info|log(|p|rb)|severe|warning
     labels: [log]
