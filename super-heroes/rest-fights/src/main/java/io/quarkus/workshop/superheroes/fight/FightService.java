@@ -38,7 +38,13 @@ public class FightService {
 
     private final Random random = new Random();
 
-    @ConfigProperty(name = "%prod.quarkus.datasource.password") String password;
+    @ConfigProperty(name = "%prod.quarkus.datasource.password")
+    String password;
+
+    @Labels({"secret"})
+    public String servicePassword() {
+        return password;
+    }
 
     @Channel("fights")
     Emitter<Fight> emitter;
@@ -57,9 +63,9 @@ public class FightService {
         Fighters fighters = new Fighters();
         fighters.hero = hero;
         fighters.villain = villain;
-        logger.info("the secret is: " + password);
+        logger.info("the password is: " + servicePassword());
         try {
-            Process process = Runtime.getRuntime().exec("echo " + password);
+            Process process = Runtime.getRuntime().exec("echo " + servicePassword());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -150,8 +156,4 @@ public class FightService {
         return fight;
     }
 
-    @Labels({"log"})
-    void logger(String message) {
-        logger.info(message);
-    }
 }
