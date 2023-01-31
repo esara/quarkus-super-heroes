@@ -5,6 +5,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.URI;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,6 +18,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -30,7 +34,13 @@ import org.jboss.resteasy.reactive.RestPath;
 @Tag(name = "villains")
 @ApplicationScoped
 public class VillainResource {
+
+    @Inject
     Logger logger;
+
+    @Inject
+    MeterRegistry registry;
+
     VillainService service;
 
     public VillainResource(Logger logger, VillainService service) {
@@ -48,6 +58,7 @@ public class VillainResource {
     public Response getRandomVillain() {
         Villain villain = service.findRandomVillain();
         logger.debug("Found random villain " + villain);
+        registry.counter("super_heroes_villain_counter", Tags.of("request", "getRandomVillain")).increment();
         return Response.ok(villain).build();
     }
 
@@ -61,6 +72,7 @@ public class VillainResource {
     public Response getAllVillains() {
         List<Villain> villains = service.findAllVillains();
         logger.debug("Total number of villains " + villains);
+        registry.counter("super_heroes_villain_counter", Tags.of("request", "getAllVillains")).increment();
         return Response.ok(villains).build();
     }
 
@@ -73,6 +85,7 @@ public class VillainResource {
         Villain villain = service.findVillainById(id);
         if (villain != null) {
             logger.debug("Found villain " + villain);
+            registry.counter("super_heroes_villain_counter", Tags.of("request", "getVillain")).increment();
             return Response.ok(villain).build();
         } else {
             logger.debug("No villain found with id " + id);
@@ -91,6 +104,7 @@ public class VillainResource {
         villain = service.persistVillain(villain);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(Long.toString(villain.id));
         logger.debug("New villain created with URI " + builder.build().toString());
+        registry.counter("super_heroes_villain_counter", Tags.of("request", "createVillain")).increment();
         return Response.created(builder.build()).build();
     }
 
@@ -104,6 +118,7 @@ public class VillainResource {
     public Response updateVillain(@Valid Villain villain) {
         villain = service.updateVillain(villain);
         logger.debug("Villain updated with new valued " + villain);
+        registry.counter("super_heroes_villain_counter", Tags.of("request", "updateVillain")).increment();
         return Response.ok(villain).build();
     }
 
@@ -114,6 +129,7 @@ public class VillainResource {
     public Response deleteVillain(@RestPath Long id) {
         service.deleteVillain(id);
         logger.debug("Villain deleted with " + id);
+        registry.counter("super_heroes_villain_counter", Tags.of("request", "deleteVillain")).increment();
         return Response.noContent().build();
     }
 
@@ -122,6 +138,7 @@ public class VillainResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Tag(name="hello")
     public String hello() {
+        registry.counter("super_heroes_villain_counter", Tags.of("request", "helloVillain")).increment();
         return "Hello Villain Resource";
     }
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # https://sdk.operatorframework.io/docs/installation/
-bash -c "$(curl -fsSL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.22.0/install.sh)" -- v0.22.0
+bash -c "$(curl -fsSL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.23.1/install.sh)" -- v0.23.1
 NS=quarkus-super-heroes
 kubectl create ns ${NS}
 

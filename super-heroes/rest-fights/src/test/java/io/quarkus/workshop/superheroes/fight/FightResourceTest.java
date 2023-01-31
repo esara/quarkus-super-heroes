@@ -18,9 +18,7 @@ import java.util.Random;
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
-import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
@@ -80,7 +78,7 @@ public class FightResourceTest {
 
         given()
             .body(fighters)
-            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .contentType(APPLICATION_JSON)
             .header(ACCEPT, APPLICATION_JSON)
             .when()
             .post("/api/fights")
@@ -114,7 +112,7 @@ public class FightResourceTest {
 
         fightId = given()
             .body(fighters)
-            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .contentType(APPLICATION_JSON)
             .header(ACCEPT, APPLICATION_JSON)
             .when()
             .post("/api/fights")
@@ -130,7 +128,7 @@ public class FightResourceTest {
             .when().get("/api/fights/{id}")
             .then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .contentType(APPLICATION_JSON)
             .body("winnerName", Is.is(DEFAULT_WINNER_NAME))
             .body("winnerPicture", Is.is(DEFAULT_WINNER_PICTURE))
             .body("winnerLevel", Is.is(DEFAULT_WINNER_LEVEL))
@@ -151,7 +149,7 @@ public class FightResourceTest {
             .when().get("/api/fights/randomfighters")
             .then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .contentType(APPLICATION_JSON)
             .body("hero.name", Is.is(MockHeroProxy.DEFAULT_HERO_NAME))
             .body("hero.picture", Is.is(MockHeroProxy.DEFAULT_HERO_PICTURE))
             .body("hero.level", Is.is(MockHeroProxy.DEFAULT_HERO_LEVEL))

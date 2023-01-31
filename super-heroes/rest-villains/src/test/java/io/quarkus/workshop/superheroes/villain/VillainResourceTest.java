@@ -3,8 +3,7 @@ package io.quarkus.workshop.superheroes.villain;
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
-import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,8 +21,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VillainResourceTest {
-    private static final String JSON = "application/json;charset=UTF-8";
-
     private static final String DEFAULT_NAME = "Super Chocolatine";
     private static final String UPDATED_NAME = "Super Chocolatine (updated)";
     private static final String DEFAULT_OTHER_NAME = "Super Chocolatine chocolate in";
@@ -63,7 +60,7 @@ public class VillainResourceTest {
             .when().get("/api/villains/random")
             .then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, JSON);
+            .contentType(APPLICATION_JSON);
     }
 
     @Test
@@ -77,8 +74,8 @@ public class VillainResourceTest {
 
         given()
             .body(villain)
-            .header(CONTENT_TYPE, JSON)
-            .header(ACCEPT, JSON)
+            .contentType(APPLICATION_JSON)
+            .header(ACCEPT, APPLICATION_JSON)
             .when()
             .post("/api/villains")
             .then()
@@ -91,7 +88,7 @@ public class VillainResourceTest {
         List<Villain> villains = get("/api/villains")
             .then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, JSON)
+            .contentType(APPLICATION_JSON)
             .extract()
             .body()
             .as(getVillainTypeRef());
@@ -110,8 +107,8 @@ public class VillainResourceTest {
 
         String location = given()
             .body(villain)
-            .header(CONTENT_TYPE, JSON)
-            .header(ACCEPT, JSON)
+            .contentType(APPLICATION_JSON)
+            .header(ACCEPT, APPLICATION_JSON)
             .when()
             .post("/api/villains")
             .then()
@@ -131,7 +128,7 @@ public class VillainResourceTest {
             .get("/api/villains/{id}")
             .then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, JSON)
+            .contentType(APPLICATION_JSON)
             .body("name", Is.is(DEFAULT_NAME))
             .body("otherName", Is.is(DEFAULT_OTHER_NAME))
             .body("level", Is.is(DEFAULT_LEVEL))
@@ -141,7 +138,7 @@ public class VillainResourceTest {
         List<Villain> villains = get("/api/villains")
             .then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, JSON)
+            .contentType(APPLICATION_JSON)
             .extract()
             .body()
             .as(getVillainTypeRef());
@@ -161,13 +158,13 @@ public class VillainResourceTest {
 
         given()
             .body(villain)
-            .header(CONTENT_TYPE, JSON)
-            .header(ACCEPT, JSON)
+            .contentType(APPLICATION_JSON)
+            .header(ACCEPT, APPLICATION_JSON)
             .when()
             .put("/api/villains")
             .then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, JSON)
+            .contentType(APPLICATION_JSON)
             .body("name", Is.is(UPDATED_NAME))
             .body("otherName", Is.is(UPDATED_OTHER_NAME))
             .body("level", Is.is(UPDATED_LEVEL))
@@ -177,7 +174,7 @@ public class VillainResourceTest {
         List<Villain> villains = get("/api/villains")
             .then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, JSON)
+            .contentType(APPLICATION_JSON)
             .extract()
             .body()
             .as(getVillainTypeRef());
@@ -195,7 +192,7 @@ public class VillainResourceTest {
 
         List<Villain> villains = get("/api/villains").then()
             .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, JSON)
+            .contentType(APPLICATION_JSON)
             .extract()
             .body()
             .as(getVillainTypeRef());
@@ -205,7 +202,7 @@ public class VillainResourceTest {
     @Test
     void shouldPingOpenAPI() {
         given()
-            .header(ACCEPT, JSON)
+            .header(ACCEPT, APPLICATION_JSON)
             .when().get("/q/openapi")
             .then()
             .statusCode(OK.getStatusCode());

@@ -3,6 +3,7 @@ kind: Database
 metadata:
     name: heroes
 spec:
+    databaseStorageClassName: gp2
     databaseCpu: 30m
     databaseCpuLimit: 60m
     databaseMemoryLimit: 512Mi
@@ -14,5 +15,5 @@ spec:
     databaseStorageRequest: 1Gi
     databaseUser: superman
     databaseUserKeyEnvVar: POSTGRESQL_USER
-    image: centos/postgresql-96-centos7
+    image: centos/postgresql-12-centos8
     size: 1
