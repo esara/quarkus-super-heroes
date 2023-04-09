@@ -42,6 +42,11 @@ spec:
                     configMapKeyRef:
                       name: villain-config
                       key: database
+                - name: QUARKUS_DATASOURCE_PASSWORD
+                  valueFrom:
+                      secretKeyRef:
+                          name: superbad.villains.credentials.postgresql.acid.zalan.do
+                          key: password
             livenessProbe:
                 httpGet:
                     path: /q/health/live

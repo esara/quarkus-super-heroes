@@ -1,19 +1,17 @@
-apiVersion: postgresql.dev4devs.com/v1alpha1
-kind: Database
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
 metadata:
     name: villains
 spec:
-    databaseStorageClassName: gp2
-    databaseCpu: 30m
-    databaseCpuLimit: 60m
-    databaseMemoryLimit: 512Mi
-    databaseMemoryRequest: 128Mi
-    databaseName: villain
-    databaseNameKeyEnvVar: POSTGRESQL_DATABASE
-    databasePassword: superbad
-    databasePasswordKeyEnvVar: POSTGRESQL_PASSWORD
-    databaseStorageRequest: 1Gi
-    databaseUser: superbad
-    databaseUserKeyEnvVar: POSTGRESQL_USER
-    image: centos/postgresql-12-centos8
-    size: 1
+    teamId: "quarkus-super-heroes"
+    volume:
+        size: 1Gi
+    numberOfInstances: 2
+    users:
+        superbad:  # database owner
+            - superuser
+            - createdb
+    databases:
+        villain: superbad  # dbname: owner
+    postgresql:
+        version: "15"

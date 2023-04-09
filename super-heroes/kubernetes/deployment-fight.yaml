@@ -42,6 +42,11 @@ spec:
                     configMapKeyRef:
                       name: fight-config
                       key: database
+                - name: QUARKUS_DATASOURCE_PASSWORD
+                  valueFrom:
+                      secretKeyRef:
+                          name: superfight.fights.credentials.postgresql.acid.zalan.do
+                          key: password
                 - name: IO_QUARKUS_WORKSHOP_SUPERHEROES_FIGHT_CLIENT_HEROPROXY_MP_REST_URL
                   valueFrom:
                     configMapKeyRef:
