@@ -1,0 +1,78 @@
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  labels:
+    app: "quarkus-workshop-hero"
+    version: "01"
+    group: "super-heroes"
+  name: "quarkus-workshop-hero"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "quarkus-workshop-hero"
+      version: "01"
+      group: "super-heroes"
+  template:
+    metadata:
+      labels:
+        app: "quarkus-workshop-hero"
+        version: "01"
+        group: "super-heroes"
+    spec:
+      containers:
+      - image: "esara/quarkus-workshop-hero"
+        imagePullPolicy: "IfNotPresent"
+        name: "quarkus-workshop-hero"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: "KUBERNETES_NAMESPACE"
+          valueFrom:
+            fieldRef:
+              fieldPath: "metadata.namespace"
+        - name: QUARKUS_HTTP_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: hero-config
+              key: port
+        - name: QUARKUS_DATASOURCE_REACTIVE_URL
+          value: postgresql://$(endpoint):$(port)/hero
+        - name: QUARKUS_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: heroes-connection-secret
+              key: password
+        envFrom:
+        - secretRef:
+            name: heroes-connection-secret
+        livenessProbe:
+          httpGet:
+            path: /q/health/live
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /q/health/ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  labels:
+    app: "quarkus-workshop-hero"
+    version: "01"
+    group: "super-heroes"
+  name: "quarkus-workshop-hero"
+spec:
+  ports:
+  - name: "http"
+    port: 8080
+  selector:
+    app: "quarkus-workshop-hero"
+    version: "01"
+    group: "super-heroes"
+  type: "ClusterIP"

@@ -25,24 +25,28 @@
     <name>Quarkus Workshop :: Super-Heroes :: Super Heroes UI</name>
 
     <properties>
-        <compiler-plugin.version>3.10.1</compiler-plugin.version>
+        <compiler-plugin.version>3.11.0</compiler-plugin.version>
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <quarkus.version>2.16.0.Final</quarkus.version>
-        <surefire-plugin.version>3.0.0-M8</surefire-plugin.version>
-        <node.version>v14.19.0</node.version>
-        <npm.version>6.14.16</npm.version>
-        <frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
+        <quarkus.version>2.16.5.Final</quarkus.version>
+        <surefire-plugin.version>3.0.0</surefire-plugin.version>
+        <node.version>v16.20.0</node.version>
+        <npm.version>8.19.4</npm.version>
+        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-reactive</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
         </dependency>
     </dependencies>
 

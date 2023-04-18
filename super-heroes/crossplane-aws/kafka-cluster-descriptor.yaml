@@ -1,0 +1,63 @@
+apiVersion: kafka.aws.crossplane.io/v1alpha1
+kind: Cluster
+metadata:
+  name: super-heroes
+spec:
+  forProvider:
+    clusterName: super-heroes
+    region: us-east-2
+    brokerNodeGroupInfo:
+      clientSubnets:
+      - subnet-081ec67fcb58c84d8
+      - subnet-09fa95e81730c8202
+      - subnet-0ec3f08a1f28407d8
+      securityGroups:
+      - sg-0ca2fc2bdfa907816
+      instanceType: kafka.t3.small
+      storageInfo:
+        ebsStorageInfo:
+          volumeSize: 10
+    kafkaVersion: 3.3.2
+    clientAuthentication:
+      sasl:
+        scram:
+          enabled: true
+    configurationInfo:
+      arnRef:
+        name: quarkus-configuration
+      revision: 1
+    numberOfBrokerNodes: 3
+  writeConnectionSecretToRef:
+    name: kafka-connection-secret
+    namespace: quarkus-super-heroes
+  providerConfigRef:
+    name: default
+---
+apiVersion: kafka.aws.crossplane.io/v1alpha1
+kind: Configuration
+metadata:
+  name: quarkus-configuration
+  namespace: crossplane-system
+spec:
+  forProvider:
+    region: us-east-2
+    kafkaVersions:
+    - 3.3.2
+    properties:
+    - auto.create.topics.enable=true
+    - default.replication.factor=3
+    - allow.everyone.if.no.acl.found=false
+    - min.insync.replicas=2
+    - num.io.threads=8
+    - num.network.threads=5
+    - num.partitions=1
+    - num.replica.fetchers=2
+    - replica.lag.time.max.ms=30000
+    - socket.receive.buffer.bytes=102400
+    - socket.request.max.bytes=104857600
+    - socket.send.buffer.bytes=102400
+    - unclean.leader.election.enable=true
+    - zookeeper.session.timeout.ms=18000
+  providerConfigRef:
+    name: default
+

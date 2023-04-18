@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: quarkus
+    annotations:
+        alb.ingress.kubernetes.io/scheme: internet-facing
+spec:
+    ingressClassName: alb
+    rules:
+      - http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: quarkus-workshop-ui
+                port:
+                  number: 8080
+          - path: /api/fights
+            pathType: Prefix
+            backend:
+              service:
+                name: quarkus-workshop-fight
+                port:
+                  number: 8082
+          - path: /api/stats
+            pathType: Prefix
+            backend:
+              service:
+                name: quarkus-workshop-stat
+                port:
+                  number: 8085
