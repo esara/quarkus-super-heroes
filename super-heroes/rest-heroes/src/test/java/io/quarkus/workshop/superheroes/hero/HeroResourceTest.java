@@ -8,17 +8,20 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Random;
 
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
-import static javax.ws.rs.core.HttpHeaders.ACCEPT;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.CREATED;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
-import static javax.ws.rs.core.Response.Status.OK;
+import static jakarta.ws.rs.core.HttpHeaders.ACCEPT;
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
+import static jakarta.ws.rs.core.Response.Status.CREATED;
+import static jakarta.ws.rs.core.Response.Status.NO_CONTENT;
+import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,7 +44,7 @@ public class HeroResourceTest {
     private static final int DEFAULT_LEVEL = 42;
     private static final int UPDATED_LEVEL = 43;
 
-    private static final int NB_HEROES = 951;
+    private static final int NB_HEROES = 941;
     private static String heroId;
 
     @Test
@@ -56,6 +59,7 @@ public class HeroResourceTest {
     @Test
     public void testHelloEndpoint() {
         given()
+            .header(ACCEPT, TEXT_PLAIN)
             .when().get("/api/heroes/hello")
             .then()
             .statusCode(200)
@@ -92,7 +96,7 @@ public class HeroResourceTest {
 
         given()
             .body(hero)
-            .contentType(APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
             .header(ACCEPT, APPLICATION_JSON)
             .when()
             .post("/api/heroes")
@@ -104,9 +108,9 @@ public class HeroResourceTest {
     @Order(1)
     void shouldGetInitialItems() {
         List<Hero> heroes = get("/api/heroes").then()
-            .statusCode(OK.getStatusCode())
-            .contentType(APPLICATION_JSON)
-            .extract().body().as(getHeroTypeRef());
+                                              .statusCode(OK.getStatusCode())
+                                              .contentType(APPLICATION_JSON)
+                                              .extract().body().as(getHeroTypeRef());
         assertEquals(NB_HEROES, heroes.size());
     }
 
@@ -122,7 +126,7 @@ public class HeroResourceTest {
 
         String location = given()
             .body(hero)
-            .contentType(APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
             .header(ACCEPT, APPLICATION_JSON)
             .when()
             .post("/api/heroes")
@@ -148,8 +152,8 @@ public class HeroResourceTest {
             .body("powers", Is.is(DEFAULT_POWERS));
 
         List<Hero> heroes = get("/api/heroes").then()
-            .statusCode(OK.getStatusCode())
-            .extract().body().as(getHeroTypeRef());
+                                              .statusCode(OK.getStatusCode())
+                                              .extract().body().as(getHeroTypeRef());
         assertEquals(NB_HEROES + 1, heroes.size());
     }
 
@@ -166,7 +170,7 @@ public class HeroResourceTest {
 
         given()
             .body(hero)
-            .contentType(APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
             .header(ACCEPT, APPLICATION_JSON)
             .when()
             .put("/api/heroes")
@@ -180,9 +184,9 @@ public class HeroResourceTest {
             .body("powers", Is.is(UPDATED_POWERS));
 
         List<Hero> heroes = get("/api/heroes").then()
-            .statusCode(OK.getStatusCode())
-            .contentType(APPLICATION_JSON)
-            .extract().body().as(getHeroTypeRef());
+                                              .statusCode(OK.getStatusCode())
+                                              .contentType(APPLICATION_JSON)
+                                              .extract().body().as(getHeroTypeRef());
         assertEquals(NB_HEROES + 1, heroes.size());
     }
 
@@ -196,9 +200,9 @@ public class HeroResourceTest {
             .statusCode(NO_CONTENT.getStatusCode());
 
         List<Hero> heroes = get("/api/heroes").then()
-            .statusCode(OK.getStatusCode())
-            .contentType(APPLICATION_JSON)
-            .extract().body().as(getHeroTypeRef());
+                                              .statusCode(OK.getStatusCode())
+                                              .contentType(APPLICATION_JSON)
+                                              .extract().body().as(getHeroTypeRef());
         assertEquals(NB_HEROES, heroes.size());
     }
 

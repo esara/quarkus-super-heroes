@@ -1,26 +1,36 @@
 package io.quarkus.workshop.superheroes.villain;
 
-import static io.restassured.RestAssured.get;
-import static io.restassured.RestAssured.given;
-import static javax.ws.rs.core.HttpHeaders.ACCEPT;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.*;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.jupiter.api.Assertions.*;
-
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.common.mapper.TypeRef;
-import java.util.List;
-import java.util.Random;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.List;
+import java.util.Random;
+
+import static io.restassured.RestAssured.get;
+import static io.restassured.RestAssured.given;
+import static jakarta.ws.rs.core.HttpHeaders.ACCEPT;
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
+import static jakarta.ws.rs.core.Response.Status.CREATED;
+import static jakarta.ws.rs.core.Response.Status.NO_CONTENT;
+import static jakarta.ws.rs.core.Response.Status.OK;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VillainResourceTest {
+    private static final String JSON = "application/json;charset=UTF-8";
+
     private static final String DEFAULT_NAME = "Super Chocolatine";
     private static final String UPDATED_NAME = "Super Chocolatine (updated)";
     private static final String DEFAULT_OTHER_NAME = "Super Chocolatine chocolate in";
@@ -32,15 +42,15 @@ public class VillainResourceTest {
     private static final int DEFAULT_LEVEL = 42;
     private static final int UPDATED_LEVEL = 43;
 
-    private static final int NB_VILLAINS = 581;
+    private static final int NB_VILLAINS = 570;
     private static String villainId;
 
     @Test
     public void testHelloEndpoint() {
         given()
+            .header(ACCEPT, TEXT_PLAIN)
             .when().get("/api/villains/hello")
-            .then()
-            .statusCode(200)
+            .then().statusCode(200)
             .body(is("Hello Villain Resource"));
     }
 
@@ -190,7 +200,8 @@ public class VillainResourceTest {
             .then()
             .statusCode(NO_CONTENT.getStatusCode());
 
-        List<Villain> villains = get("/api/villains").then()
+        List<Villain> villains = get("/api/villains")
+            .then()
             .statusCode(OK.getStatusCode())
             .contentType(APPLICATION_JSON)
             .extract()
@@ -204,8 +215,7 @@ public class VillainResourceTest {
         given()
             .header(ACCEPT, APPLICATION_JSON)
             .when().get("/q/openapi")
-            .then()
-            .statusCode(OK.getStatusCode());
+            .then().statusCode(OK.getStatusCode());
     }
 
     private TypeRef<List<Villain>> getVillainTypeRef() {

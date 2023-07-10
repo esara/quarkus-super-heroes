@@ -3,10 +3,13 @@ package io.quarkus.workshop.superheroes.fight;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Entity;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
+/**
+ * Entity class for a Fight. Re-used in the API layer
+ */
 @Entity
 @Schema(description="Each fight has a winner and a loser")
 public class Fight extends PanacheEntity {

@@ -1,5 +1,5 @@
 ####
-# This Dockerfile is used in order to build a container that runs the Quarkus application in native (no JVM) mode
+# This Dockerfile is used in order to build a container that runs the Quarkus application in native (no JVM) mode.
 #
 # Before building the container image run:
 #
@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native -t esara/quarkus-workshop-villain .
+# docker build -f src/main/docker/Dockerfile.native -t esara/quarkus-workshop-villains .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/quarkus-workshop-villain
+# docker run -i --rm -p 8080:8080 quarkus/quarkus-workshop-villains
 #
 ###
 FROM registry.access.redhat.com/ubi9/ubi-minimal

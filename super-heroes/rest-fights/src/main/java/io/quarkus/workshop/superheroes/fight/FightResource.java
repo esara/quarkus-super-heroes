@@ -1,25 +1,26 @@
 package io.quarkus.workshop.superheroes.fight;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.jboss.logging.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
+/**
+ * JAX-RS API endpoints with {@code /api/fights} as the base URI for all endpoints
+ */
 @Path("/api/fights")
 @Produces(APPLICATION_JSON)
 @ApplicationScoped
@@ -27,9 +28,6 @@ public class FightResource {
 
     @Inject
     Logger logger;
-
-    @Inject
-    MeterRegistry registry;
 
     @Inject
     FightService service;
@@ -52,7 +50,6 @@ public class FightResource {
         veryLongProcess();
         Fighters fighters = service.findRandomFighters();
         logger.debug("Get random fighters " + fighters);
-        registry.counter("super_heroes_fight_counter", Tags.of("request", "getRandomFighters")).increment();
         return Response.ok(fighters).build();
     }
 
@@ -60,7 +57,6 @@ public class FightResource {
     public Response getAllFights() {
         List<Fight> fights = service.findAllFights();
         logger.debug("Total number of fights " + fights);
-        registry.counter("super_heroes_fight_counter", Tags.of("request", "getAllFights")).increment();
         return Response.ok(fights).build();
     }
 
@@ -70,7 +66,6 @@ public class FightResource {
         Fight fight = service.findFightById(id);
         if (fight != null) {
             logger.debug("Found fight " + fight);
-            registry.counter("super_heroes_fight_counter", Tags.of("request", "getFight")).increment();
             return Response.ok(fight).build();
         } else {
             logger.debug("No fight found with id " + id);
@@ -80,7 +75,6 @@ public class FightResource {
 
     @POST
     public Fight fight(@Valid Fighters fighters, UriInfo uriInfo) {
-        registry.counter("super_heroes_fight_counter", Tags.of("request", "fight")).increment();
         return service.persistFight(fighters);
     }
 
@@ -88,7 +82,6 @@ public class FightResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/hello")
     public String hello() {
-        registry.counter("super_heroes_fight_counter", Tags.of("request", "helloFight")).increment();
         return "Hello Fight Resource";
     }
 }
