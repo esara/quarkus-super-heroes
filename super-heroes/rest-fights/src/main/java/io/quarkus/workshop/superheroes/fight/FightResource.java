@@ -1,5 +1,7 @@
 package io.quarkus.workshop.superheroes.fight;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.jboss.logging.Logger;
@@ -30,6 +32,9 @@ public class FightResource {
     Logger logger;
 
     @Inject
+    MeterRegistry registry;
+
+    @Inject
     FightService service;
 
     @ConfigProperty(name = "process.milliseconds", defaultValue = "0")
@@ -50,6 +55,7 @@ public class FightResource {
         veryLongProcess();
         Fighters fighters = service.findRandomFighters();
         logger.debug("Get random fighters " + fighters);
+        registry.counter("super_heroes_fight_counter", Tags.of("request", "getRandomFighters")).increment();
         return Response.ok(fighters).build();
     }
 
@@ -57,6 +63,7 @@ public class FightResource {
     public Response getAllFights() {
         List<Fight> fights = service.findAllFights();
         logger.debug("Total number of fights " + fights);
+        registry.counter("super_heroes_fight_counter", Tags.of("request", "getAllFights")).increment();
         return Response.ok(fights).build();
     }
 
@@ -66,6 +73,7 @@ public class FightResource {
         Fight fight = service.findFightById(id);
         if (fight != null) {
             logger.debug("Found fight " + fight);
+            registry.counter("super_heroes_fight_counter", Tags.of("request", "getFight")).increment();
             return Response.ok(fight).build();
         } else {
             logger.debug("No fight found with id " + id);
@@ -75,6 +83,7 @@ public class FightResource {
 
     @POST
     public Fight fight(@Valid Fighters fighters, UriInfo uriInfo) {
+        registry.counter("super_heroes_fight_counter", Tags.of("request", "fight")).increment();
         return service.persistFight(fighters);
     }
 
@@ -82,6 +91,7 @@ public class FightResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/hello")
     public String hello() {
+        registry.counter("super_heroes_fight_counter", Tags.of("request", "helloFight")).increment();
         return "Hello Fight Resource";
     }
 }
