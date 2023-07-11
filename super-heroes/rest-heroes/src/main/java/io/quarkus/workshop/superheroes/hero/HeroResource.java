@@ -1,5 +1,7 @@
 package io.quarkus.workshop.superheroes.hero;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -12,6 +14,7 @@ import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestResponse;
 
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -38,6 +41,9 @@ public class HeroResource {
 
     Logger logger;
 
+    @Inject
+    MeterRegistry registry;
+
     public HeroResource(Logger logger) {
         this.logger = logger;
     }
@@ -47,6 +53,7 @@ public class HeroResource {
     @Path("/random")
     @APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = Hero.class, required = true)))
     public Uni<Response> getRandomHero() {
+        registry.counter("super_heroes_hero_counter", Tags.of("request", "getRandomHero")).increment();
         return Hero.findRandom()
             .onItem().ifNotNull().transform(h -> {
                 this.logger.debugf("Found random hero: %s", h);
@@ -63,6 +70,7 @@ public class HeroResource {
     @APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = Hero.class, type = SchemaType.ARRAY)))
     @APIResponse(responseCode = "204", description = "No Heroes")
     public Uni<List<Hero>> getAllHeroes() {
+        registry.counter("super_heroes_hero_counter", Tags.of("request", "getAllHeroes")).increment();
         return Hero.listAll();
     }
 
@@ -75,6 +83,7 @@ public class HeroResource {
         return Hero.<Hero>findById(id)
             .map(hero -> {
                 if (hero != null) {
+                    registry.counter("super_heroes_hero_counter", Tags.of("request", "getHero")).increment();
                     return RestResponse.ok(hero);
                 }
                 logger.debugf("No Hero found with id %d", id);
@@ -91,6 +100,7 @@ public class HeroResource {
             .map(h -> {
                 UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(Long.toString(h.id));
                 logger.debug("New Hero created with URI " + builder.build().toString());
+                registry.counter("super_heroes_hero_counter", Tags.of("request", "createHero")).increment();
                 return RestResponse.created(builder.build());
             });
     }
@@ -107,10 +117,12 @@ public class HeroResource {
                 retrieved.level = hero.level;
                 retrieved.picture = hero.picture;
                 retrieved.powers = hero.powers;
+                registry.counter("super_heroes_hero_counter", Tags.of("request", "updateHero")).increment();
                 return retrieved;
             })
             .map(h -> {
                 logger.debugf("Hero updated with new valued %s", h);
+                registry.counter("super_heroes_hero_counter", Tags.of("request", "updateHeroWithValue")).increment();
                 return h;
             });
 
@@ -122,6 +134,7 @@ public class HeroResource {
     @APIResponse(responseCode = "204")
     @WithTransaction
     public Uni<RestResponse<Void>> deleteHero(@RestPath Long id) {
+        registry.counter("super_heroes_hero_counter", Tags.of("request", "deleteHero")).increment();
         return Hero.deleteById(id)
             .invoke(() -> logger.debugf("Hero deleted with %d", id))
             .replaceWith(RestResponse.noContent());
@@ -132,6 +145,7 @@ public class HeroResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Tag(name = "hello")
     public String hello() {
+        registry.counter("super_heroes_hero_counter", Tags.of("request", "helloHero")).increment();
         return "Hello Hero Resource";
     }
 }
