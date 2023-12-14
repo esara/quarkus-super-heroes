@@ -1,25 +1,25 @@
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: HTTPRoute
-metadata:
-    name: quarkus
-spec:
-    parentRefs:
-    - name: uswest-demows
-      namespace: quarkus-super-heroes
-    rules:
-    - backendRefs:
-      - name: quarkus-workshop-ui
-        namespace: quarkus-super-heroes
-        port: 8080
-    - backendRefs:
-      - name: quarkus-workshop-fight
-        namespace: quarkus-super-heroes
-        port: 8080
-      matches:
-      - path:
-          type: PathPrefix
-          value: /api/fights
----
+#apiVersion: gateway.networking.k8s.io/v1alpha2
+#kind: HTTPRoute
+#metadata:
+#    name: quarkus
+#spec:
+#    parentRefs:
+#    - name: uswest-demows
+#      namespace: quarkus-super-heroes
+#    rules:
+#    - backendRefs:
+#      - name: quarkus-workshop-ui
+#        namespace: quarkus-super-heroes
+#        port: 8080
+#    - backendRefs:
+#      - name: quarkus-workshop-fight
+#        namespace: quarkus-super-heroes
+#        port: 8080
+#      matches:
+#      - path:
+#          type: PathPrefix
+#          value: /api/fights
+#---
 #apiVersion: gateway.networking.k8s.io/v1alpha2
 #kind: HTTPRoute
 #metadata:

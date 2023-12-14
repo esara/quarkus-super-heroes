@@ -27,42 +27,42 @@ spec:
                     host: quarkus-workshop-stat.quarkus-super-heroes.svc.cluster.local
                     port:
                         number: 8080
----
-apiVersion: sre.smm.cisco.com/v1alpha1
-kind: ServiceLevelObjective
-metadata:
-    name: quarkus-workshop-fight-http-requests-success-rate
-spec:
-    selector:
-        name: quarkus-workshop-fight
-        namespace: quarkus-super-heroes
-    sli:
-        parameters:
-            reporter: source
-        templateRef:
-            name: http-requests-success-rate
-            namespace: smm-system
-    slo:
-        goal: "99.9"
-        rolling:
-            length: 336h0m0s
----
-apiVersion: sre.smm.cisco.com/v1alpha1
-kind: ServiceLevelObjective
-metadata:
-    name: quarkus-workshop-fight-http-requests-duration
-spec:
-    selector:
-        name: quarkus-workshop-fight
-        namespace: quarkus-super-heroes
-    sli:
-        parameters:
-            reporter: source
-            threshold: "100"
-        templateRef:
-            name: http-requests-duration
-            namespace: smm-system
-    slo:
-        goal: "99.9"
-        rolling:
-            length: 336h0m0s
+#---
+#apiVersion: sre.smm.cisco.com/v1alpha1
+#kind: ServiceLevelObjective
+#metadata:
+#    name: quarkus-workshop-fight-http-requests-success-rate
+#spec:
+#    selector:
+#        name: quarkus-workshop-fight
+#        namespace: quarkus-super-heroes
+#    sli:
+#        parameters:
+#            reporter: source
+#        templateRef:
+#            name: http-requests-success-rate
+#            namespace: smm-system
+#    slo:
+#        goal: "99.9"
+#        rolling:
+#            length: 336h0m0s
+#---
+#apiVersion: sre.smm.cisco.com/v1alpha1
+#kind: ServiceLevelObjective
+#metadata:
+#    name: quarkus-workshop-fight-http-requests-duration
+#spec:
+#    selector:
+#        name: quarkus-workshop-fight
+#        namespace: quarkus-super-heroes
+#    sli:
+#        parameters:
+#            reporter: source
+#            threshold: "100"
+#        templateRef:
+#            name: http-requests-duration
+#            namespace: smm-system
+#    slo:
+#        goal: "99.9"
+#        rolling:
+#            length: 336h0m0s
