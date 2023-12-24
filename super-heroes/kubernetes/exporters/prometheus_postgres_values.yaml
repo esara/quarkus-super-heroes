@@ -1,16 +1,23 @@
-image:
-  tag: v0.10.1
-
 config:
-  datasource:
-    password: postgresql://superfight:superfight@fights:5432/fight,postgresql://superman:superman@heroes:5432/hero,postgresql://superbad:superbad@villains:5432/villain
+#  datasource:
+#    password: postgresql://superfight:superfight@fights:5432/fight,postgresql://superman:superman@heroes:5432/hero,postgresql://superbad:superbad@villains:5432/villain
+
 # Specifies if datasource should be sourced from secret value in format: postgresql://login:password@hostname:port/dbname?sslmode=disable
 # Multiple Postgres databases can be configured by comma separated postgres connection strings
-#  datasourceSecret:
-#    # Secret name
+  datasourceSecret:
+    # Secret name
+    name: prometheus-postgres-exporter
+    # Connection string key inside secret
+    key: data_source_name
+
+# Sample secret:
+#apiVersion: v1
+#kind: Secret
+#type: Opaque
+#metadata:
 #    name: prometheus-postgres-exporter
-#    # Connection string key inside secret
-#    key: data_source_password
+#stringdData:
+#    data_source_name: postgresql://superfight:superfight@fights:5432/fight,postgresql://superman:superman@heroes:5432/hero,postgresql://superbad:superbad@villains:5432/villain
 
 service:
   port: 9187
