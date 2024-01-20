@@ -1,10 +1,54 @@
 apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: super-heroes-pool
+  labels:
+    strimzi.io/cluster: super-heroes
+spec:
+  replicas: 3
+  roles:
+    - controller
+    - broker
+  storage:
+    type: ephemeral
+#---
+#apiVersion: kafka.strimzi.io/v1beta2
+#kind: KafkaNodePool
+#metadata:
+#  name: super-heroes-controller
+#  labels:
+#    strimzi.io/cluster: super-heroes
+#spec:
+#  replicas: 3
+#  roles:
+#    - controller
+#---
+#apiVersion: kafka.strimzi.io/v1beta2
+#kind: KafkaNodePool
+#metadata:
+#  name: super-heroes-broker
+#  labels:
+#    strimzi.io/cluster: super-heroes
+#spec:
+#  replicas: 6
+#  roles:
+#    - broker
+#  storage:
+#    type: ephemeral
+---
+apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
   name: super-heroes
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
 spec:
   kafka:
-    version: 3.6.0
+    version: 3.6.1
+    metadataVersion: 3.6-IV2
+    # The replicas field is required by the Kafka CRD schema while the KafkaNodePools feature gate is in alpha phase.
+    # But it will be ignored when Kafka Node Pools are used
     replicas: 3
     listeners:
       - name: plain
@@ -22,8 +66,12 @@ spec:
       default.replication.factor: 3
       min.insync.replicas: 2
       inter.broker.protocol.version: '3.6'
+    # The storage field is required by the Kafka CRD schema while the KafkaNodePools feature gate is in alpha phase.
+    # But it will be ignored when Kafka Node Pools are used
     storage:
       type: ephemeral
+  # The ZooKeeper section is required by the Kafka CRD schema while the UseKRaft feature gate is in alpha phase.
+  # But it will be ignored when running in KRaft mode
   zookeeper:
     replicas: 3
     storage:
