@@ -9,10 +9,10 @@ spec:
     autoMinorVersionUpgrade: true
     autogeneratePassword: true
     backupRetentionPeriod: 0
-    dbInstanceClass: db.t3.micro # needs to support engine and -version (see AWS Docs: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html#Concepts.DBInstanceClass.Support)
+    dbInstanceClass: db.t4g.micro # needs to support engine and -version (see AWS Docs: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html#Concepts.DBInstanceClass.Support)
     dbName: villain
     engine: postgres
-    engineVersion: "14.7"
+    engineVersion: "16.1"
     allowMajorVersionUpgrade: true # unset per default (Note: supported dbInstanceClass and dbParameterGroup with correct dbParameterGroupFamily needed, before majorVersion upgrade possible; applyImmediately matters)
     masterUsername: superbad
     masterUserPasswordSecretRef:
@@ -24,7 +24,7 @@ spec:
     publiclyAccessible: true
     skipFinalSnapshot: true
     storageEncrypted: false
-    storageType: gp2
+    storageType: gp3
     applyImmediately: true
   writeConnectionSecretToRef:
     name: villains-connection-secret

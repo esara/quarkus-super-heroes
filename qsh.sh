@@ -8,7 +8,7 @@ if [ "$1" = "crossplane-aws" ]; then
 
 # https://docs.crossplane.io/master/getting-started/provider-aws/
 helm repo add crossplane-stable https://charts.crossplane.io/stable
-helm install crossplane crossplane-stable/crossplane --namespace crossplane-system --create-namespace
+helm upgrade --install crossplane crossplane-stable/crossplane --namespace crossplane-system --create-namespace
 
 # Create crossplane aws provider
 cat <<EOF | kubectl apply -f -
@@ -17,7 +17,7 @@ kind: Provider
 metadata:
   name: provider-aws
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.38.0
+  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.47.1
 EOF
 
 # kubectl create secret generic aws-secret -n crossplane-system --from-file=creds=./crossplane/aws-credentials.txt
