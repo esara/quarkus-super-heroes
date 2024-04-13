@@ -17,7 +17,7 @@ spec:
       storageInfo:
         ebsStorageInfo:
           volumeSize: 10
-    kafkaVersion: 3.3.2
+    kafkaVersion: 3.6.0
     clientAuthentication:
       sasl:
         scram:
@@ -42,7 +42,7 @@ spec:
   forProvider:
     region: us-east-2
     kafkaVersions:
-    - 3.3.2
+    - 3.6.0
     properties:
     - auto.create.topics.enable=true
     - default.replication.factor=3

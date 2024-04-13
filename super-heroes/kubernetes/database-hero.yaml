@@ -14,4 +14,4 @@ spec:
     databases:
         hero: superman  # dbname: owner
     postgresql:
-        version: "15"
+        version: "16"

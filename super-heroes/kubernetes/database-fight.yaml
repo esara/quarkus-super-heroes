@@ -14,4 +14,4 @@ spec:
     databases:
         fight: superfight  # dbname: owner
     postgresql:
-        version: "15"
+        version: "16"
