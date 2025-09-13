@@ -17,7 +17,7 @@ kind: Provider
 metadata:
   name: provider-aws
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.47.1
+  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.54.2
 EOF
 
 # kubectl create secret generic aws-secret -n crossplane-system --from-file=creds=./crossplane/aws-credentials.txt
@@ -49,7 +49,12 @@ helm upgrade --install prometheus-postgres-exporter prometheus-community/prometh
 
 # https://github.com/strimzi/strimzi-kafka-operator/tree/main/helm-charts/helm3/strimzi-kafka-operator
 helm repo add strimzi https://strimzi.io/charts/
-helm upgrade --install strimzi-kafka-operator strimzi/strimzi-kafka-operator -n ${NS} --set featureGates=+UseKRaft
+# first version to support KRaft
+#helm upgrade --install strimzi-kafka-operator strimzi/strimzi-kafka-operator -n ${NS} --version 0.29.0 --set featureGates=+UseKRaft
+# last version to support zookeeper
+#helm upgrade --install strimzi-kafka-operator strimzi/strimzi-kafka-operator -n ${NS} --version 0.45.0
+# starting with 0.46.0 only KRaft
+helm upgrade --install strimzi-kafka-operator strimzi/strimzi-kafka-operator -n ${NS}
 helm upgrade --install kafka-exporter prometheus-community/prometheus-kafka-exporter --namespace=quarkus-super-heroes --values super-heroes/kubernetes/exporters/prometheus_kafka_values.yaml
 
 kubectl apply -n ${NS} -f super-heroes/kubernetes
