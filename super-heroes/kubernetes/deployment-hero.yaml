@@ -47,8 +47,8 @@ spec:
                       secretKeyRef:
                           name: superman.heroes.credentials.postgresql.acid.zalan.do
                           key: password
-#                - name: QUARKUS_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-#                  value: http://grafana-agent.monitoring:4317
+                - name: QUARKUS_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+                  value: http://alloy.monitoring:4317
             livenessProbe:
                 httpGet:
                     path: /q/health/live
