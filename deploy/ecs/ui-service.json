@@ -275,14 +275,21 @@
                 "ContainerDefinitions": [
                     {
                         "Name": "quarkus-workshop-ui",
-                        "Image": "esara/quarkus-workshop-ui",
+                        "Image": "esara/quarkus-workshop-ui:baseimage",
                         "Essential": true,
                         "PortMappings": [
                             { "ContainerPort": 8080, "Protocol": "tcp" }
                         ],
                         "Environment": [
                             { "Name": "QUARKUS_HTTP_PORT", "Value": "8080" },
-                            { "Name": "CALCULATE_API_BASE_URL", "Value": "true" }
+                            { "Name": "CALCULATE_API_BASE_URL", "Value": "true" },
+                            { "Name": "LD_PRELOAD", "Value": "/opt/dynatrace/oneagent/agent/lib64/liboneagentproc.so" }
+                        ],
+                        "DependsOn": [
+                            {
+                                "ContainerName": "install-oneagent",
+                                "Condition": "COMPLETE"
+                            }
                         ],
                         "LogConfiguration": {
                             "LogDriver": "awslogs",
@@ -292,6 +299,12 @@
                                 "awslogs-stream-prefix": "ui"
                             }
                         },
+                        "MountPoints": [
+                            {
+                                "ContainerPath": "/opt/dynatrace/oneagent",
+                                "SourceVolume": "oneagent"
+                            }
+                        ],
                         "HealthCheck": {
                             "Command": ["CMD-SHELL", "curl -fsS http://localhost:8080/q/health/live || exit 1"],
                             "Interval": 30,
@@ -299,6 +312,44 @@
                             "Retries": 3,
                             "StartPeriod": 60
                         }
+                    },
+                    {
+                        "Name": "install-oneagent",
+                        "Image": "alpine:3.14",
+                        "Essential": false,
+                        "PortMappings": [],
+                        "Environment": [
+                            { "Name": "DT_API_URL", "Value": "https://XXX.live.dynatrace.com/api" },
+                            { "Name": "DT_ONEAGENT_OPTIONS", "Value": "flavor=default&include=all" },
+                            { "Name": "DT_PAAS_TOKEN", "Value": "dt0c01.YYY" }
+                        ],
+                        "LogConfiguration": {
+                            "LogDriver": "awslogs",
+                            "Options": {
+                                "awslogs-group": "/ecs/quarkus-workshop",
+                                "awslogs-region": "us-east-2",
+                                "awslogs-stream-prefix": "dynatrace"
+                            }
+                        },
+                        "EntryPoint": [
+                            "/bin/sh",
+                            "-c"
+                        ],
+                        "Command": [
+                            "ARCHIVE=$(mktemp) && wget -O $ARCHIVE \"$DT_API_URL/v1/deployment/installer/agent/unix/paas/latest?Api-Token=$DT_PAAS_TOKEN&$DT_ONEAGENT_OPTIONS\" && unzip -o -d /opt/dynatrace/oneagent $ARCHIVE && rm -f $ARCHIVE"
+                        ],
+                        "MountPoints": [
+                            {
+                                "ContainerPath": "/opt/dynatrace/oneagent",
+                                "SourceVolume": "oneagent"
+                            }
+                        ]
+                    }
+                ],
+                "Volumes": [
+                    {
+                        "Name": "oneagent",
+                        "Host": {}
                     }
                 ],
                 "Tags": [
