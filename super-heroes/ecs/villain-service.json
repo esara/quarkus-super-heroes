@@ -1,0 +1,270 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "The template used to create an ECS Service from the ECS Console.",
+    "Parameters": {
+        "CreateIAMRoles": {
+            "Type": "String",
+            "Default": "False",
+            "AllowedValues": [
+                "True",
+                "False"
+            ],
+            "Description": "Whether to create default IAM roles",
+            "ConstraintDescription": "must specify True or False."
+        },
+        "ExecutionRoleArn": {
+            "Type": "String",
+            "Default": "arn:aws:iam::040365544943:role/ecsTaskExecutionRole",
+            "Description": "Enter the role arn you want to use as the ecs execution role"
+        },
+        "ECSClusterName": {
+            "Type": "String",
+            "Default": "chaos"
+        },
+        "ECSServiceName": {
+            "Type": "String",
+            "Default": "quarkus-workshop-villain-service"
+        },
+        "ServiceDiscoveryNamespace": {
+            "Type": "String",
+            "Default": "arn:aws:servicediscovery:us-east-2:040365544943:namespace/ns-xigcyagcxdoxa5th"
+        },
+        "ServiceDiscoveryNamespaceId": {
+            "Type": "String",
+            "Default": "ns-xigcyagcxdoxa5th"
+        },
+        "SecurityGroupIDs": {
+            "Type": "CommaDelimitedList",
+            "Default": "sg-0ca2fc2bdfa907816"
+        },
+        "SubnetIDs": {
+            "Type": "CommaDelimitedList",
+            "Default": "subnet-0ec3f08a1f28407d8,subnet-081ec67fcb58c84d8,subnet-09fa95e81730c8202"
+        },
+        "VpcID": {
+            "Type": "String",
+            "Default": "vpc-0aa141fb0f6ddb9aa"
+        }
+    },
+    "Conditions": {
+        "CreateRoles": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateIAMRoles"
+                },
+                "True"
+            ]
+        },
+        "DefaultExecutionRole": {
+            "Fn::Equals": [
+                {
+                    "Ref": "ExecutionRoleArn"
+                },
+                "Default"
+            ]
+        }
+    },
+    "Resources": {
+        "ECSTaskDefinition": {
+            "Type": "AWS::ECS::TaskDefinition",
+            "Properties": {
+                "Family": "quarkus-workshop-villain",
+                "NetworkMode": "awsvpc",
+                "RequiresCompatibilities": ["FARGATE"],
+                "Cpu": "256",
+                "Memory": "512",
+                "ExecutionRoleArn": {
+                    "Ref": "ExecutionRoleArn"
+                },
+                "ContainerDefinitions": [
+                    {
+                        "Name": "quarkus-workshop-villain",
+                        "Image": "esara/quarkus-workshop-villain",
+                        "Essential": true,
+                        "PortMappings": [
+                            { "ContainerPort": 8080, "Protocol": "tcp", "Name": "villain-port" }
+                        ],
+                        "Environment": [
+                            { "Name": "QUARKUS_HTTP_PORT", "Value": "8080" },
+                            { "Name": "QUARKUS_DATASOURCE_JDBC_URL", "Value": "jdbc:postgresql://villains:5432/villain" },
+                            { "Name": "QUARKUS_DATASOURCE_PASSWORD", "Value": "postgres" }
+                        ],
+                        "LogConfiguration": {
+                            "LogDriver": "awslogs",
+                            "Options": {
+                                "awslogs-group": "/ecs/quarkus-workshop",
+                                "awslogs-region": "us-east-2",
+                                "awslogs-stream-prefix": "villain"
+                            }
+                        },
+                        "HealthCheck": {
+                            "Command": ["CMD-SHELL", "curl -fsS http://localhost:8080/q/health/live  || exit 1"],
+                            "Interval": 30,
+                            "Timeout": 5,
+                            "Retries": 3,
+                            "StartPeriod": 60
+                        }
+                    }
+                ],
+                "Tags": [
+                    { "Key": "app", "Value": "quarkus-workshop-villain" }
+                ]
+            }
+        },
+        "ECSService": {
+            "Type": "AWS::ECS::Service",
+            "Properties": {
+                "Cluster": {
+                    "Ref": "ECSClusterName"
+                },
+                "CapacityProviderStrategy": [
+                    {
+                        "CapacityProvider": "FARGATE",
+                        "Base": 0,
+                        "Weight": 1
+                    }
+                ],
+                "TaskDefinition": {
+                    "Ref": "ECSTaskDefinition"
+                },
+                "ServiceName": {
+                    "Ref": "ECSServiceName"
+                },
+                "SchedulingStrategy": "REPLICA",
+                "DesiredCount": 1,
+                "AvailabilityZoneRebalancing": "ENABLED",
+                "NetworkConfiguration": {
+                    "AwsvpcConfiguration": {
+                        "AssignPublicIp": "ENABLED",
+                        "SecurityGroups": {
+                            "Ref": "SecurityGroupIDs"
+                        },
+                        "Subnets": {
+                            "Ref": "SubnetIDs"
+                        }
+                    }
+                },
+                "PlatformVersion": "LATEST",
+                "DeploymentConfiguration": {
+                    "DeploymentCircuitBreaker": {
+                        "Enable": true,
+                        "Rollback": true
+                    },
+                    "Strategy": "ROLLING",
+                    "MaximumPercent": 200,
+                    "MinimumHealthyPercent": 100
+                },
+                "DeploymentController": {
+                    "Type": "ECS"
+                },
+                "ServiceConnectConfiguration": {
+                    "Enabled": true,
+                    "Namespace": {
+                        "Ref": "ServiceDiscoveryNamespace"
+                    },
+                    "Services": [
+                        {
+                            "PortName": "villain-port",
+                            "ClientAliases": [
+                                {
+                                    "Port": 8080,
+                                    "DnsName": "quarkus-workshop-villain"
+                                }
+                            ]
+                        }
+                    ],
+                    "LogConfiguration": {
+                        "LogDriver": "awslogs",
+                        "Options": {
+                            "awslogs-group": "/ecs/quarkus-workshop",
+                            "awslogs-region": "us-east-2",
+                            "awslogs-stream-prefix": "villain-service"
+                        }
+                    }
+                },
+                "ServiceRegistries": [
+                    {
+                        "RegistryArn": {
+                            "Fn::GetAtt": [
+                                "ServiceDiscoveryService",
+                                "Arn"
+                            ]
+                        }
+                    }
+                ],
+                "Tags": [],
+                "EnableECSManagedTags": true,
+                "EnableExecuteCommand": false
+            },
+            "DependsOn": [
+                "ECSTaskDefinition",
+                "ServiceDiscoveryService"
+            ]
+        },
+        "ServiceDiscoveryService": {
+            "Type": "AWS::ServiceDiscovery::Service",
+            "Properties": {
+                "Name": "quarkus-workshop-villain",
+                "DnsConfig": {
+                    "DnsRecords": [
+                        {
+                            "Type": "A",
+                            "TTL": 15
+                        }
+                    ]
+                },
+                "NamespaceId": {
+                    "Ref": "ServiceDiscoveryNamespaceId"
+                },
+                "HealthCheckCustomConfig": {
+                    "FailureThreshold": 1
+                }
+            }
+        },
+        "ECSExecutionRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateRoles",
+            "Properties": {
+                "Description": "Allows ECS container agent makes calls to the Amazon ECS API on your behalf.",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "ecs-tasks.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+                    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+                    "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+                ],
+                "RoleName": "QuarkusExecutionRole"
+            }
+        }
+    },
+    "Outputs": {
+        "ClusterName": {
+            "Description": "The cluster used to create the service.",
+            "Value": {
+                "Ref": "ECSClusterName"
+            }
+        },
+        "ECSService": {
+            "Description": "The created service.",
+            "Value": {
+                "Ref": "ECSService"
+            }
+        },
+        "ServiceDiscoveryService": {
+            "Value": {
+                "Ref": "ServiceDiscoveryService"
+            }
+        }
+    }
+}
