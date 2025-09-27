@@ -1,3 +1,14 @@
+// Polyfill for process object - must be first!
+(window as any).process = (window as any).process || {
+  env: {},
+  argv: [],
+  version: '',
+  versions: {},
+  platform: 'browser',
+  browser: true
+};
+(window as any).global = (window as any).global || window;
+
 import {enableProdMode} from '@angular/core';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
