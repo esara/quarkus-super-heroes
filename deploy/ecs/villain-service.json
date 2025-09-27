@@ -64,7 +64,7 @@
                 "ContainerDefinitions": [
                     {
                         "Name": "quarkus-workshop-villain",
-                        "Image": "esara/quarkus-workshop-villain",
+                        "Image": "esara/quarkus-workshop-villain:baseimage",
                         "Essential": true,
                         "PortMappings": [
                             { "ContainerPort": 8080, "Protocol": "tcp", "Name": "villain-port" }
@@ -73,7 +73,14 @@
                             { "Name": "QUARKUS_HTTP_PORT", "Value": "8080" },
                             { "Name": "QUARKUS_DATASOURCE_JDBC_URL", "Value": "jdbc:postgresql://super:5432/villain" },
                             { "Name": "QUARKUS_DATASOURCE_USERNAME", "Value": "super" },
-                            { "Name": "QUARKUS_DATASOURCE_PASSWORD", "Value": "postgres" }
+                            { "Name": "QUARKUS_DATASOURCE_PASSWORD", "Value": "postgres" },
+                            { "Name": "LD_PRELOAD", "Value": "/opt/dynatrace/oneagent/agent/lib64/liboneagentproc.so" }
+                        ],
+                        "DependsOn": [
+                            {
+                                "ContainerName": "install-oneagent",
+                                "Condition": "COMPLETE"
+                            }
                         ],
                         "LogConfiguration": {
                             "LogDriver": "awslogs",
@@ -83,6 +90,12 @@
                                 "awslogs-stream-prefix": "villain"
                             }
                         },
+                        "MountPoints": [
+                            {
+                                "ContainerPath": "/opt/dynatrace/oneagent",
+                                "SourceVolume": "oneagent"
+                            }
+                        ],
                         "HealthCheck": {
                             "Command": ["CMD-SHELL", "curl -fsS http://localhost:8080/q/health/live  || exit 1"],
                             "Interval": 30,
@@ -90,6 +103,44 @@
                             "Retries": 3,
                             "StartPeriod": 60
                         }
+                    },
+                    {
+                        "Name": "install-oneagent",
+                        "Image": "alpine:3.14",
+                        "Essential": false,
+                        "PortMappings": [],
+                        "Environment": [
+                            { "Name": "DT_API_URL", "Value": "https://XXX.live.dynatrace.com/api" },
+                            { "Name": "DT_ONEAGENT_OPTIONS", "Value": "flavor=default&include=all" },
+                            { "Name": "DT_PAAS_TOKEN", "Value": "dt0c01.YYY" }
+                        ],
+                        "LogConfiguration": {
+                            "LogDriver": "awslogs",
+                            "Options": {
+                                "awslogs-group": "/ecs/quarkus-workshop",
+                                "awslogs-region": "us-east-2",
+                                "awslogs-stream-prefix": "dynatrace"
+                            }
+                        },
+                        "EntryPoint": [
+                            "/bin/sh",
+                            "-c"
+                        ],
+                        "Command": [
+                            "ARCHIVE=$(mktemp) && wget -O $ARCHIVE \"$DT_API_URL/v1/deployment/installer/agent/unix/paas/latest?Api-Token=$DT_PAAS_TOKEN&$DT_ONEAGENT_OPTIONS\" && unzip -o -d /opt/dynatrace/oneagent $ARCHIVE && rm -f $ARCHIVE"
+                        ],
+                        "MountPoints": [
+                            {
+                                "ContainerPath": "/opt/dynatrace/oneagent",
+                                "SourceVolume": "oneagent"
+                            }
+                        ]
+                    }
+                ],
+                "Volumes": [
+                    {
+                        "Name": "oneagent",
+                        "Host": {}
                     }
                 ],
                 "Tags": [
