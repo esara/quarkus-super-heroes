@@ -17,7 +17,7 @@ kind: Provider
 metadata:
   name: provider-aws
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.54.2
+  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.56.0
 EOF
 
 # kubectl create secret generic aws-secret -n crossplane-system --from-file=creds=./crossplane/aws-credentials.txt

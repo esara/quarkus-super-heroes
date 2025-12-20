@@ -13,11 +13,14 @@ spec:
       - subnet-0ec3f08a1f28407d8
       securityGroups:
       - sg-0ca2fc2bdfa907816
-      instanceType: kafka.t3.small
+      instanceType: kafka.m7g.large
       storageInfo:
         ebsStorageInfo:
           volumeSize: 10
-    kafkaVersion: 3.6.0
+      connectivityInfo:
+        publicAccess:
+          type: SERVICE_PROVIDED_EIPS
+    kafkaVersion: 4.1.x.kraft
     clientAuthentication:
       sasl:
         scram:
@@ -41,23 +44,9 @@ metadata:
 spec:
   forProvider:
     region: us-east-2
-    kafkaVersions:
-    - 3.6.0
     properties:
     - auto.create.topics.enable=true
-    - default.replication.factor=3
     - allow.everyone.if.no.acl.found=false
-    - min.insync.replicas=2
-    - num.io.threads=8
-    - num.network.threads=5
     - num.partitions=1
-    - num.replica.fetchers=2
-    - replica.lag.time.max.ms=30000
-    - socket.receive.buffer.bytes=102400
-    - socket.request.max.bytes=104857600
-    - socket.send.buffer.bytes=102400
-    - unclean.leader.election.enable=true
-    - zookeeper.session.timeout.ms=18000
   providerConfigRef:
     name: default
-
