@@ -6,13 +6,12 @@ spec:
   forProvider:
     region: us-east-2
     allocatedStorage: 20
-    autoMinorVersionUpgrade: true
     autogeneratePassword: true
     backupRetentionPeriod: 0
     dbInstanceClass: db.t4g.micro # needs to support engine and -version (see AWS Docs: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html#Concepts.DBInstanceClass.Support)
     dbName: fight
     engine: postgres
-    engineVersion: "16.1"
+    engineVersion: "18.1"
     allowMajorVersionUpgrade: true # unset per default (Note: supported dbInstanceClass and dbParameterGroup with correct dbParameterGroupFamily needed, before majorVersion upgrade possible; applyImmediately matters)
     masterUsername: superfight
     masterUserPasswordSecretRef:
@@ -23,11 +22,7 @@ spec:
     preferredMaintenanceWindow: "Sat:8:00-Sat:11:00"
     publiclyAccessible: true
     skipFinalSnapshot: true
-    storageEncrypted: false
-    storageType: gp3
     applyImmediately: true
   writeConnectionSecretToRef:
     name: fights-connection-secret
     namespace: quarkus-super-heroes
-  providerConfigRef:
-    name: default

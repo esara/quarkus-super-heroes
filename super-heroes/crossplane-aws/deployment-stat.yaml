@@ -38,9 +38,9 @@ spec:
               key: port
         - name: KAFKA_BOOTSTRAP_SERVERS
           valueFrom:
-            secretRef:
+            secretKeyRef:
               name: kafka-connection-secret
-              key: clusterEndpointTls
+              key: clusterEndpointScramPublic
         - name: KAFKA_SECURITY_PROTOCOL
           value: SASL_SSL
         - name: KAFKA_SASL_MECHANISM

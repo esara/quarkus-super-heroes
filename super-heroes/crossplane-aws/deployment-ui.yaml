@@ -22,11 +22,11 @@ spec:
     spec:
       containers:
       - image: "esara/quarkus-workshop-ui"
-      imagePullPolicy: "IfNotPresent"
-      name: "quarkus-workshop-hero"
-      ports:
+        imagePullPolicy: "IfNotPresent"
+        name: "quarkus-workshop-hero"
+        ports:
         - containerPort: 8080
-      env:
+        env:
         - name: "KUBERNETES_NAMESPACE"
           valueFrom:
             fieldRef:
