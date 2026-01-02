@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-config
+data:
+  quarkus.otel.exporter.otlp.traces.endpoint: "http://alloy.monitoring:4317"
+  calculate.api.base.url: "true"

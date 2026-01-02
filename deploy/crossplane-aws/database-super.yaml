@@ -1,0 +1,30 @@
+apiVersion: rds.aws.crossplane.io/v1alpha1
+kind: DBInstance
+metadata:
+  name: super
+spec:
+  forProvider:
+    region: us-east-2
+    allocatedStorage: 20
+    autogeneratePassword: true
+    backupRetentionPeriod: 0
+    dbInstanceClass: db.t4g.micro # needs to support engine and -version (see AWS Docs: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html#Concepts.DBInstanceClass.Support)
+    dbName: super
+    engine: postgres
+    engineVersion: "18.1"
+    allowMajorVersionUpgrade: true # unset per default (Note: supported dbInstanceClass and dbParameterGroup with correct dbParameterGroupFamily needed, before majorVersion upgrade possible; applyImmediately matters)
+    masterUsername: super
+    masterUserPasswordSecretRef:
+      key: password
+      name: super-secret
+      namespace: crossplane-system
+    preferredBackupWindow: "07:00-08:00"
+    preferredMaintenanceWindow: "sat:08:00-sat:11:00"
+    publiclyAccessible: true
+    skipFinalSnapshot: true
+    applyImmediately: true
+  publishConnectionDetailsTo:
+    name: default
+  writeConnectionSecretToRef:
+    name: super-dbs-connection-secret
+    namespace: quarkus-super-heroes

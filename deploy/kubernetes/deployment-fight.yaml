@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+    app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+    app.openshift.io/connects-to: "fights-db,fights-kafka,apicurio,rest-villains,rest-heroes,rest-narration,grpc-locations,otel-collector"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: quarkus-workshop-fight
+    app.kubernetes.io/part-of: fights-service
+    app.kubernetes.io/managed-by: quarkus
+  name: quarkus-workshop-fight
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: quarkus-workshop-fight
+      app.kubernetes.io/part-of: fights-service
+  template:
+    metadata:
+      annotations:
+        app.quarkus.io/vcs-ref: main
+        app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+        app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+        app.openshift.io/connects-to: "fights-db,fights-kafka,apicurio,rest-villains,rest-heroes,rest-narration,grpc-locations,otel-collector"
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /q/metrics
+        prometheus.io/port: "8082"
+        prometheus.io/scheme: http
+      labels:
+        app.kubernetes.io/name: quarkus-workshop-fight
+        app.kubernetes.io/part-of: fights-service
+        app.kubernetes.io/managed-by: quarkus
+    spec:
+      containers:
+        - image: esara/quarkus-workshop-fight
+          imagePullPolicy: IfNotPresent
+          name: quarkus-workshop-fight
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: QUARKUS_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: superfight.super-dbs.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: superfight.super-dbs.credentials.postgresql.acid.zalan.do
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: fight-config
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /q/health/started
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            limits:
+              memory: 4Gi
+            requests:
+              memory: 32Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+    app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+    app.openshift.io/connects-to: "fights-db,fights-kafka,apicurio,rest-villains,rest-heroes,rest-narration,grpc-locations,otel-collector"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: quarkus-workshop-fight
+    app.kubernetes.io/part-of: fights-service
+    app.kubernetes.io/managed-by: quarkus
+  name: quarkus-workshop-fight
+spec:
+  ports:
+    - name: http
+      port: 8082
+  selector:
+    app.kubernetes.io/name: quarkus-workshop-fight
+    app.kubernetes.io/part-of: fights-service
+  type: ClusterIP

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: villain-config
+data:
+  quarkus.datasource.jdbc.url: "jdbc:postgresql://super-dbs:5432/villain"
+  quarkus.hibernate-orm.schema-management.strategy: "create"
+  quarkus.otel.exporter.otlp.traces.endpoint: "http://alloy.monitoring:4317"

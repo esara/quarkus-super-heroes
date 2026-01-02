@@ -1,0 +1,29 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: super-dbs
+spec:
+  teamId: "quarkus-super-heroes"
+  volume:
+    size: 10Gi
+  numberOfInstances: 2
+  users:
+    superfight:  # database owner for fight
+      - superuser
+      - createdb
+    superman:  # database owner for hero
+      - superuser
+      - createdb
+    superbad:  # database owner for villain
+      - superuser
+      - createdb
+    superlocation:  # database owner for locations
+      - superuser
+      - createdb
+  databases:
+    fight: superfight
+    hero: superman
+    villain: superbad
+    locations: superlocation
+  postgresql:
+    version: "16"

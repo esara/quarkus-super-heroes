@@ -1,0 +1,309 @@
+name: Basic build and test
+
+on:
+  push:
+    paths-ignore:
+      - '.editorconfig'
+      - '**/deploy/**'
+      - '**/*.md'
+      - 'docs/**'
+      - '**/images/**'
+      - '.github/dependabot.yml'
+      - '.github/quarkus-ecosystem-test'
+      - '.github/workflows/quarkus-snapshot.yaml'
+      - '.github/workflows/build-push-ui-images.yml'
+      - '.github/workflows/dependabot-automerge.yml'
+      - '.github/workflows/sonar-scan.yml'
+      - '.github/workflows/build-push-container-images.yml'
+      - '.github/workflows/build-push-container-images-3.15.Final.yml'
+      - '.github/workflows/build-push-container-images-3.20.Final.yml'
+      - '.github/workflows/build-push-container-images-rhbq-3.15.yml'
+      - '.github/workflows/build-push-container-images-rhbq-3.20.yml'
+      - '.github/calculateModules.java'
+      - '.sonarlint/**'
+      - 'scripts/deploy-to-azure-containerapps.sh'
+      - 'scripts/create-azure-openai-resources.sh'
+      - 'scripts/delete-azure-openai-resources.sh'
+      - 'scripts/watch-services.sh'
+      - '**/hyperfoil/**'
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    branches:
+      - main
+    paths-ignore:
+      - '.editorconfig'
+      - '**/deploy/**'
+      - '**/*.md'
+      - 'docs/**'
+      - '**/images/**'
+      - '.github/dependabot.yml'
+      - '.github/build-push-container-images*.yml'
+      - '.github/quarkus-ecosystem-test'
+      - '.github/workflows/quarkus-snapshot.yaml'
+      - '.github/workflows/build-push-ui-images.yml'
+      - '.github/workflows/dependabot-automerge.yml'
+      - '.github/workflows/sonar-scan.yml'
+      - '.github/workflows/build-push-container-images.yml'
+      - '.github/workflows/build-push-container-images-3.15.Final.yml'
+      - '.github/workflows/build-push-container-images-3.20.Final.yml'
+      - '.github/workflows/build-push-container-images-rhbq-3.15.yml'
+      - '.github/workflows/build-push-container-images-rhbq-3.20.yml'
+      - '.github/calculateModules.java'
+      - '.sonarlint/**'
+      - 'scripts/*.sh'
+      - '**/hyperfoil/**'
+  workflow_dispatch:
+
+concurrency:
+  group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  jvm-build-test:
+    runs-on: ubuntu-latest
+    if: github.repository == 'quarkusio/quarkus-super-heroes'
+    strategy:
+      fail-fast: true
+      matrix:
+        java:
+          - '21'
+        project:
+          - { name: event-statistics }
+          - { name: rest-fights }
+          - { name: rest-heroes }
+          - { name: rest-villains }
+          - { name: rest-narration }
+          - { name: rest-narration, openai-type: azure-openai }
+          - { name: grpc-locations }
+          - { name: ui-super-heroes }
+    name: "build-test-${{ matrix.project.name }}-${{ matrix.java }}-${{ matrix.project.openai-type }}"
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Java ${{ matrix.java }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: temurin
+          cache: maven
+
+      - name: Create env vars
+        if: matrix.project.openai-type
+        working-directory: ${{ matrix.project.name }}
+        run: |
+          echo "QUARKUS_PROFILE=${{ matrix.project.openai-type }}" >> $GITHUB_ENV && \
+          echo "QUARKUS_TEST_INTEGRATION_TEST_PROFILE=${{ matrix.project.openai-type }}" >> $GITHUB_ENV
+
+      - name: "build-test-jvm-${{ matrix.project.name }}-java-${{ matrix.java }}-${{ matrix.project.openai-type }}"
+        working-directory: ${{ matrix.project.name }}
+        run: |
+          ./mvnw -B clean verify \
+            -Dquarkus.http.host=0.0.0.0 \
+            -Dmaven.compiler.release=${{ matrix.java }}
+
+  jvm-container-build-test:
+    runs-on: ubuntu-latest
+    if: github.repository == 'quarkusio/quarkus-super-heroes'
+    needs: jvm-build-test
+    strategy:
+      fail-fast: true
+      matrix:
+        java:
+          - '21'
+        project:
+          - { name: rest-heroes }
+          - { name: rest-villains }
+          - { name: rest-narration }
+          - { name: rest-narration, openai-type: azure-openai }
+          - { name: grpc-locations }
+          - { name: ui-super-heroes }
+    name: "container-build-test-${{ matrix.project.name }}-${{ matrix.java }}-${{ matrix.project.openai-type }}"
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Java ${{ matrix.java }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: temurin
+          cache: maven
+
+      - name: Create env vars
+        if: matrix.project.openai-type
+        working-directory: ${{ matrix.project.name }}
+        run: |
+          echo "QUARKUS_PROFILE=${{ matrix.project.openai-type }}" >> $GITHUB_ENV && \
+          echo "QUARKUS_TEST_INTEGRATION_TEST_PROFILE=${{ matrix.project.openai-type }}" >> $GITHUB_ENV  
+
+      - name: "build-test-jvm-container-${{ matrix.project.name }}-java-${{ matrix.java }}"
+        working-directory: ${{ matrix.project.name }}
+        run: |
+          ./mvnw -B clean verify \
+            -Dquarkus.http.host=0.0.0.0 \
+            -Dmaven.compiler.release=${{ matrix.java }} \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.test.arg-line="--add-host host.docker.internal:host-gateway"
+
+  # Can't run the integration tests for fights/statistics because of https://github.com/quarkusio/quarkus/issues/23916
+  jvm-container-build:
+    runs-on: ubuntu-latest
+    if: github.repository == 'quarkusio/quarkus-super-heroes'
+    needs: jvm-build-test
+    strategy:
+      fail-fast: true
+      matrix:
+        java:
+          - '21'
+        project:
+          - event-statistics
+          - rest-fights
+    name: "container-build-${{ matrix.project }}-${{ matrix.java }}"
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Java ${{ matrix.java }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: temurin
+          cache: maven
+
+      - name: "build-jvm-container-${{ matrix.project }}-java-${{ matrix.java }}"
+        working-directory: ${{ matrix.project }}
+        run: |
+          ./mvnw -B clean package -DskipTests \
+            -Dquarkus.http.host=0.0.0.0 \
+            -Dmaven.compiler.release=${{ matrix.java }} \
+            -Dquarkus.container-image.build=true
+
+  native-build-test:
+    runs-on: ubuntu-latest
+    if: github.repository == 'quarkusio/quarkus-super-heroes'
+    needs: jvm-build-test
+    strategy:
+      fail-fast: true
+      matrix:
+        java:
+          - { jvm: '21', mandrel: '21' }
+        project:
+          - { name: event-statistics }
+          - { name: rest-fights }
+          - { name: rest-heroes }
+          - { name: rest-villains }
+          - { name: rest-narration }
+          - { name: rest-narration, openai-type: azure-openai }
+          - { name: grpc-locations }
+          - { name: ui-super-heroes }
+    name: "native-build-test-${{ matrix.project.name }}-${{ matrix.project.openai-type }}"
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '${{ matrix.java.mandrel }}'
+          distribution: 'mandrel'
+          cache: 'maven'
+          native-image-job-reports: 'true'
+          native-image-pr-reports: 'true'
+
+      - name: Create env vars
+        if: matrix.project.openai-type
+        working-directory: ${{ matrix.project.name }}
+        run: |
+          echo "QUARKUS_PROFILE=${{ matrix.project.openai-type }}" >> $GITHUB_ENV && \
+          echo "QUARKUS_TEST_INTEGRATION_TEST_PROFILE=${{ matrix.project.openai-type }}" >> $GITHUB_ENV
+
+      - name: "build-test-native-${{ matrix.project.name }}-java-${{ matrix.java.jvm }}-${{ matrix.project.openai-type }}"
+        working-directory: ${{ matrix.project.name }}
+        run: |
+          ./mvnw -B clean verify -Pnative \
+            -Dquarkus.http.host=0.0.0.0 \
+            -Dmaven.compiler.release=${{ matrix.java.jvm }}
+
+  native-container-build-test:
+    runs-on: ubuntu-latest
+    if: github.repository == 'quarkusio/quarkus-super-heroes'
+    needs: jvm-build-test
+    strategy:
+      fail-fast: true
+      matrix:
+        java:
+          - { jvm: '21', mandrel: '21' }
+        project:
+          - { name: rest-heroes }
+          - { name: rest-villains }
+          - { name: rest-narration }
+          - { name: rest-narration, openai-type: azure-openai }
+          - { name: grpc-locations }
+          - { name: ui-super-heroes }
+    name: "native-container-build-test-${{ matrix.project.name }}-${{ matrix.project.openai-type }}"
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '${{ matrix.java.mandrel }}'
+          distribution: 'mandrel'
+          cache: 'maven'
+          native-image-job-reports: 'true'
+          native-image-pr-reports: 'true'
+
+      - name: Create env vars
+        if: matrix.project.openai-type
+        working-directory: ${{ matrix.project.name }}
+        run: |
+          echo "QUARKUS_PROFILE=${{ matrix.project.openai-type }}" >> $GITHUB_ENV && \
+          echo "QUARKUS_TEST_INTEGRATION_TEST_PROFILE=${{ matrix.project.openai-type }}" >> $GITHUB_ENV
+
+      - name: "build-test-native-container-${{ matrix.project.name }}-java-${{ matrix.java.jvm }}"
+        working-directory: ${{ matrix.project.name }}
+        run: |
+          ./mvnw -B clean verify -Pnative \
+            -Dquarkus.http.host=0.0.0.0 \
+            -Dmaven.compiler.release=${{ matrix.java.jvm }} \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.native.container-build=true \
+            -Dquarkus.test.arg-line="--add-host host.docker.internal:host-gateway"
+
+  # Can't run the integration tests for containerized fights/statistics because of https://github.com/quarkusio/quarkus/issues/23916
+  native-container-build:
+    runs-on: ubuntu-latest
+    if: github.repository == 'quarkusio/quarkus-super-heroes'
+    needs: jvm-build-test
+    strategy:
+      fail-fast: true
+      matrix:
+        java:
+          - { jvm: '21', mandrel: '21' }
+        project:
+          - event-statistics
+          - rest-fights
+    name: "native-container-build-${{ matrix.project }}"
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '${{ matrix.java.mandrel }}'
+          distribution: 'mandrel'
+          cache: 'maven'
+          native-image-job-reports: 'true'
+          native-image-pr-reports: 'true'
+
+      - name: "build-native-container-${{ matrix.project }}-java-${{ matrix.java.jvm }}"
+        working-directory: ${{ matrix.project }}
+        run: |
+          ./mvnw -B clean package -DskipTests -Pnative \
+            -Dquarkus.http.host=0.0.0.0 \
+            -Dmaven.compiler.release=${{ matrix.java.jvm }} \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.native.container-build=true

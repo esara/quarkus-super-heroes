@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stat-config
+data:
+  mp.messaging.connector.smallrye-kafka.apicurio.registry.url: "http://apicurio:8080/apis/registry/v2"
+  quarkus.http.port: "8085"
+  quarkus.otel.exporter.otlp.traces.endpoint: "http://alloy.monitoring:4317"
