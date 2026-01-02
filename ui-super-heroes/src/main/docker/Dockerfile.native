@@ -7,14 +7,14 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native -t esara/quarkus-workshop-ui .
+# docker build -f src/main/docker/Dockerfile.native -t quarkus/ui-super-heroes .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/quarkus-workshop-ui
+# docker run -i --rm -p 8080:8080 quarkus/ui-super-heroes
 #
 ###
-FROM registry.access.redhat.com/ubi9/ubi-minimal
+FROM quay.io/quarkus/ubi9-quarkus-micro-image:2.0
 WORKDIR /work/
 RUN chown 1001 /work \
     && chmod "g+rwX" /work \

@@ -1,51 +1,113 @@
 package io.quarkus.workshop.superheroes.hero;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntity;
-import io.smallrye.mutiny.Uni;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.Min;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import java.util.Random;
 
 /**
  * JPA entity class for a Hero. Re-used in the API layer.
  */
 @Entity
-public class Hero extends PanacheEntity {
+public class Hero {
+	@Id
+	@GeneratedValue
+	private Long id;
 
-    @NotNull
-    @Size(min = 3, max = 50)
-    public String name;
+	@NotNull
+	@Size(min = 3, max = 50)
+	private String name;
 
-    public String otherName;
+	private String otherName;
 
-    @NotNull
-    @Min(1)
-    public int level;
-    public String picture;
+	@NotNull
+	@Positive
+	private Integer level;
 
-    @Column(columnDefinition = "TEXT")
-    public String powers;
+	private String picture;
 
-    public static Uni<Hero> findRandom() {
-        Random random = new Random();
-        return count()
-            .map(count -> random.nextInt(count.intValue()))
-            .chain(randomHero -> findAll().page(randomHero, 1).firstResult());
-    }
+	@Column(columnDefinition = "TEXT")
+	private String powers;
 
-    @Override
-    public String toString() {
-        return "Hero{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", otherName='" + otherName + '\'' +
-            ", level=" + level +
-            ", picture='" + picture + '\'' +
-            ", powers='" + powers + '\'' +
-            '}';
-    }
+	public Long getId() {
+		return this.id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getOtherName() {
+		return this.otherName;
+	}
+
+	public void setOtherName(String otherName) {
+		this.otherName = otherName;
+	}
+
+	public Integer getLevel() {
+		return this.level;
+	}
+
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+
+	public String getPicture() {
+		return this.picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
+	}
+
+	public String getPowers() {
+		return this.powers;
+	}
+
+	public void setPowers(String powers) {
+		this.powers = powers;
+	}
+
+	@Override
+	public String toString() {
+		return "Hero{" +
+			"id=" + this.id +
+			", name='" + this.name + '\'' +
+			", otherName='" + this.otherName + '\'' +
+			", level=" + this.level +
+			", picture='" + this.picture + '\'' +
+			", powers='" + this.powers + '\'' +
+			'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Hero hero = (Hero) o;
+		return this.id.equals(hero.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.id);
+	}
 }

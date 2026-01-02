@@ -1,0 +1,192 @@
+{
+  "consumer": {
+    "name": "rest-fights"
+  },
+  "interactions": [
+    {
+      "comments": {
+        "testname": "io.quarkus.workshop.superheroes.fight.service.FightServiceConsumerContractTests.helloLocationsSuccess()"
+      },
+      "description": "A hello request",
+      "interactionMarkup": {
+        "markup": "```protobuf\nmessage HelloRequest {\n}\n```\n\n```protobuf\nmessage HelloReply {\n    string message = 1;\n}\n```\n",
+        "markupType": "COMMON_MARK"
+      },
+      "key": "6157e489",
+      "pending": false,
+      "pluginConfiguration": {
+        "protobuf": {
+          "descriptorKey": "ba973add9b2313f0bbc43eb3d3c82708",
+          "service": ".io.quarkus.workshop.superheroes.location.v1.Locations/Hello"
+        }
+      },
+      "request": {
+        "contents": {
+          "content": ""
+        },
+        "metadata": {
+          "contentType": "application/protobuf;message=.io.quarkus.workshop.superheroes.location.v1.HelloRequest"
+        }
+      },
+      "response": [
+        {
+          "contents": {
+            "content": "Cg9IZWxsbyBsb2NhdGlvbiE=",
+            "contentType": "application/protobuf; message=.io.quarkus.workshop.superheroes.location.v1.HelloReply",
+            "contentTypeHint": "BINARY",
+            "encoded": "base64"
+          },
+          "matchingRules": {
+            "body": {
+              "$.message": {
+                "combine": "AND",
+                "matchers": [
+                  {
+                    "match": "regex",
+                    "regex": ".+"
+                  }
+                ]
+              }
+            }
+          },
+          "metadata": {
+            "contentType": "application/protobuf;message=.io.quarkus.workshop.superheroes.location.v1.HelloReply"
+          }
+        }
+      ],
+      "transport": "grpc",
+      "type": "Synchronous/Messages"
+    },
+    {
+      "comments": {
+        "testname": "io.quarkus.workshop.superheroes.fight.service.FightServiceConsumerContractTests.findRandomLocationSuccess()"
+      },
+      "description": "A request for a random location",
+      "interactionMarkup": {
+        "markup": "```protobuf\nmessage RandomLocationRequest {\n}\n```\n\n```protobuf\nmessage Location {\n    string name = 1;\n    string picture = 3;\n}\n```\n",
+        "markupType": "COMMON_MARK"
+      },
+      "key": "be585f93",
+      "pending": false,
+      "pluginConfiguration": {
+        "protobuf": {
+          "descriptorKey": "ba973add9b2313f0bbc43eb3d3c82708",
+          "service": ".io.quarkus.workshop.superheroes.location.v1.Locations/GetRandomLocation"
+        }
+      },
+      "request": {
+        "contents": {
+          "content": ""
+        },
+        "metadata": {
+          "contentType": "application/protobuf;message=.io.quarkus.workshop.superheroes.location.v1.RandomLocationRequest"
+        }
+      },
+      "response": [
+        {
+          "contents": {
+            "content": "CgtHb3RoYW0gQ2l0eRooaHR0cDovL3d3dy5zb21ld2hlcmUuY29tL2dvdGhhbV9jaXR5LnBuZw==",
+            "contentType": "application/protobuf; message=.io.quarkus.workshop.superheroes.location.v1.Location",
+            "contentTypeHint": "BINARY",
+            "encoded": "base64"
+          },
+          "matchingRules": {
+            "body": {
+              "$.name": {
+                "combine": "AND",
+                "matchers": [
+                  {
+                    "match": "regex",
+                    "regex": ".+"
+                  }
+                ]
+              },
+              "$.picture": {
+                "combine": "AND",
+                "matchers": [
+                  {
+                    "match": "regex",
+                    "regex": "((http|https):\\/\\/).+"
+                  }
+                ]
+              }
+            }
+          },
+          "metadata": {
+            "contentType": "application/protobuf;message=.io.quarkus.workshop.superheroes.location.v1.Location"
+          }
+        }
+      ],
+      "transport": "grpc",
+      "type": "Synchronous/Messages"
+    },
+    {
+      "comments": {
+        "testname": "io.quarkus.workshop.superheroes.fight.service.FightServiceConsumerContractTests.findRandomLocationNoLocationFound()"
+      },
+      "description": "A request for a random location",
+      "interactionMarkup": {
+        "markup": "```protobuf\nmessage RandomLocationRequest {\n}\n```\n\n```protobuf\nmessage Location {\n}\n```\n",
+        "markupType": "COMMON_MARK"
+      },
+      "key": "5dffc2cf",
+      "pending": false,
+      "pluginConfiguration": {
+        "protobuf": {
+          "descriptorKey": "ba973add9b2313f0bbc43eb3d3c82708",
+          "service": ".io.quarkus.workshop.superheroes.location.v1.Locations/GetRandomLocation"
+        }
+      },
+      "providerStates": [
+        {
+          "name": "No random location found"
+        }
+      ],
+      "request": {
+        "contents": {
+          "content": ""
+        },
+        "metadata": {
+          "contentType": "application/protobuf;message=.io.quarkus.workshop.superheroes.location.v1.RandomLocationRequest"
+        }
+      },
+      "response": [
+        {
+          "contents": {
+            "content": ""
+          },
+          "metadata": {
+            "contentType": "application/protobuf;message=.io.quarkus.workshop.superheroes.location.v1.Location",
+            "grpc-message": "A location was not found",
+            "grpc-status": "NOT_FOUND"
+          }
+        }
+      ],
+      "transport": "grpc",
+      "type": "Synchronous/Messages"
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.11"
+    },
+    "pactSpecification": {
+      "version": "4.0"
+    },
+    "plugins": [
+      {
+        "configuration": {
+          "ba973add9b2313f0bbc43eb3d3c82708": {
+            "protoDescriptors": "Cs4XCidzcmMvbWFpbi9wcm90by9sb2NhdGlvbnNlcnZpY2UtdjEucHJvdG8SK2lvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEiqQEKCExvY2F0aW9uEhIKBG5hbWUYASABKAlSBG5hbWUSIAoLZGVzY3JpcHRpb24YAiABKAlSC2Rlc2NyaXB0aW9uEhgKB3BpY3R1cmUYAyABKAlSB3BpY3R1cmUSTQoEdHlwZRgEIAEoDjI5LmlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEuTG9jYXRpb25UeXBlUgR0eXBlIhcKFVJhbmRvbUxvY2F0aW9uUmVxdWVzdCIVChNBbGxMb2NhdGlvbnNSZXF1ZXN0ImQKDUxvY2F0aW9uc0xpc3QSUwoJbG9jYXRpb25zGAEgAygLMjUuaW8ucXVhcmt1cy53b3Jrc2hvcC5zdXBlcmhlcm9lcy5sb2NhdGlvbi52MS5Mb2NhdGlvblIJbG9jYXRpb25zIhsKGURlbGV0ZUFsbExvY2F0aW9uc1JlcXVlc3QiHAoaRGVsZXRlQWxsTG9jYXRpb25zUmVzcG9uc2UiHQobUmVwbGFjZUFsbExvY2F0aW9uc1Jlc3BvbnNlIigKEkdldExvY2F0aW9uUmVxdWVzdBISCgRuYW1lGAEgASgJUgRuYW1lIg4KDEhlbGxvUmVxdWVzdCImCgpIZWxsb1JlcGx5EhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2UqUgoMTG9jYXRpb25UeXBlEgoKBlBMQU5FVBAAEggKBENJVFkQARIJCgVQTEFDRRACEgoKBklTTEFORBADEgsKB0NPVU5UUlkQBBIICgRNT09OEAUyiwcKCUxvY2F0aW9ucxKQAQoRR2V0UmFuZG9tTG9jYXRpb24SQi5pby5xdWFya3VzLndvcmtzaG9wLnN1cGVyaGVyb2VzLmxvY2F0aW9uLnYxLlJhbmRvbUxvY2F0aW9uUmVxdWVzdBo1LmlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEuTG9jYXRpb24iABKRAQoPR2V0QWxsTG9jYXRpb25zEkAuaW8ucXVhcmt1cy53b3Jrc2hvcC5zdXBlcmhlcm9lcy5sb2NhdGlvbi52MS5BbGxMb2NhdGlvbnNSZXF1ZXN0GjouaW8ucXVhcmt1cy53b3Jrc2hvcC5zdXBlcmhlcm9lcy5sb2NhdGlvbi52MS5Mb2NhdGlvbnNMaXN0IgASpwEKEkRlbGV0ZUFsbExvY2F0aW9ucxJGLmlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEuRGVsZXRlQWxsTG9jYXRpb25zUmVxdWVzdBpHLmlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEuRGVsZXRlQWxsTG9jYXRpb25zUmVzcG9uc2UiABKNAQoRR2V0TG9jYXRpb25CeU5hbWUSPy5pby5xdWFya3VzLndvcmtzaG9wLnN1cGVyaGVyb2VzLmxvY2F0aW9uLnYxLkdldExvY2F0aW9uUmVxdWVzdBo1LmlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEuTG9jYXRpb24iABKdAQoTUmVwbGFjZUFsbExvY2F0aW9ucxI6LmlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEuTG9jYXRpb25zTGlzdBpILmlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEuUmVwbGFjZUFsbExvY2F0aW9uc1Jlc3BvbnNlIgASfQoFSGVsbG8SOS5pby5xdWFya3VzLndvcmtzaG9wLnN1cGVyaGVyb2VzLmxvY2F0aW9uLnYxLkhlbGxvUmVxdWVzdBo3LmlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24udjEuSGVsbG9SZXBseSIAQkcKLWlvLnF1YXJrdXMud29ya3Nob3Auc3VwZXJoZXJvZXMubG9jYXRpb24uZ3JwY0IUTG9jYXRpb25TZXJ2aWNlUHJvdG9QAUrECgoGEgQAADUBCggKAQwSAwAAEgoICgEIEgMCACIKCQoCCAoSAwIAIgoICgEIEgMDAEYKCQoCCAESAwMARgoICgEIEgMEADUKCQoCCAgSAwQANQoICgECEgMGADQKCgoCBQASBAgADwEKCgoDBQABEgMIBREKCwoEBQACABIDCQINCgwKBQUAAgABEgMJAggKDAoFBQACAAISAwkLDAoLCgQFAAIBEgMKAgsKDAoFBQACAQESAwoCBgoMCgUFAAIBAhIDCgkKCgsKBAUAAgISAwsCDAoMCgUFAAICARIDCwIHCgwKBQUAAgICEgMLCgsKCwoEBQACAxIDDAINCgwKBQUAAgMBEgMMAggKDAoFBQACAwISAwwLDAoLCgQFAAIEEgMNAg4KDAoFBQACBAESAw0CCQoMCgUFAAIEAhIDDQwNCgsKBAUAAgUSAw4CCwoMCgUFAAIFARIDDgIGCgwKBQUAAgUCEgMOCQoKCgoCBAASBBEAFgEKCgoDBAABEgMRCBAKCwoEBAACABIDEgISCgwKBQQAAgAFEgMSAggKDAoFBAACAAESAxIJDQoMCgUEAAIAAxIDEhARCgsKBAQAAgESAxMCGQoMCgUEAAIBBRIDEwIICgwKBQQAAgEBEgMTCRQKDAoFBAACAQMSAxMXGAoLCgQEAAICEgMUAhUKDAoFBAACAgUSAxQCCAoMCgUEAAICARIDFAkQCgwKBQQAAgIDEgMUExQKCwoEBAACAxIDFQIYCgwKBQQAAgMGEgMVAg4KDAoFBAACAwESAxUPEwoMCgUEAAIDAxIDFRYXCgkKAgQBEgMYACAKCgoDBAEBEgMYCB0KCQoCBAISAxkAHgoKCgMEAgESAxkIGwoKCgIEAxIEGwAdAQoKCgMEAwESAxsIFQoLCgQEAwIAEgMcAiIKDAoFBAMCAAQSAxwCCgoMCgUEAwIABhIDHAsTCgwKBQQDAgABEgMcFB0KDAoFBAMCAAMSAxwgIQoJCgIEBBIDHwAkCgoKAwQEARIDHwghCgkKAgQFEgMgACUKCgoDBAUBEgMgCCIKCQoCBAYSAyIAJgoKCgMEBgESAyIIIwoKCgIEBxIEJAAmAQoKCgMEBwESAyQIGgoLCgQEBwIAEgMlAhIKDAoFBAcCAAUSAyUCCAoMCgUEBwIAARIDJQkNCgwKBQQHAgADEgMlEBEKCQoCBAgSAygAFwoKCgMECAESAygIFAoKCgIECRIEKgAsAQoKCgMECQESAyoIEgoLCgQECQIAEgMrAhUKDAoFBAkCAAUSAysCCAoMCgUECQIAARIDKwkQCgwKBQQJAgADEgMrExQKCgoCBgASBC4ANQEKCgoDBgABEgMuCBEKCwoEBgACABIDLwJECgwKBQYAAgABEgMvBhcKDAoFBgACAAISAy8YLQoMCgUGAAIAAxIDLzhACgsKBAYAAgESAzACRQoMCgUGAAIBARIDMAYVCgwKBQYAAgECEgMwFikKDAoFBgACAQMSAzA0QQoLCgQGAAICEgMxAlsKDAoFBgACAgESAzEGGAoMCgUGAAICAhIDMRkyCgwKBQYAAgIDEgMxPVcKCwoEBgACAxIDMgJBCgwKBQYAAgMBEgMyBhcKDAoFBgACAwISAzIYKgoMCgUGAAIDAxIDMjU9CgsKBAYAAgQSAzMCUQoMCgUGAAIEARIDMwYZCgwKBQYAAgQCEgMzGicKDAoFBgACBAMSAzMyTQoLCgQGAAIFEgM0AjEKDAoFBgACBQESAzQGCwoMCgUGAAIFAhIDNAwYCgwKBQYAAgUDEgM0Iy1iBnByb3RvMw==",
+            "protoFile": "syntax = \"proto3\";\n\noption java_multiple_files = true;\noption java_package = \"io.quarkus.workshop.superheroes.location.grpc\";\noption java_outer_classname = \"LocationServiceProto\";\n\npackage io.quarkus.workshop.superheroes.location.v1;\n\nenum LocationType {\n  PLANET = 0;\n  CITY = 1;\n  PLACE = 2;\n  ISLAND = 3;\n  COUNTRY = 4;\n  MOON = 5;\n}\n\nmessage Location {\n  string name = 1;\n  string description = 2;\n  string picture = 3;\n  LocationType type = 4;\n}\n\nmessage RandomLocationRequest {}\n\nmessage LocationsList {\n  repeated Location locations = 1;\n}\n\nmessage HelloRequest {}\n\nmessage HelloReply {\n  string message = 1;\n}\n\nservice Locations {\n  rpc GetRandomLocation(RandomLocationRequest) returns (Location) {}\n  rpc Hello(HelloRequest) returns (HelloReply) {}\n}\n"
+          }
+        },
+        "name": "protobuf",
+        "version": "0.5.4"
+      }
+    ]
+  },
+  "provider": {
+    "name": "grpc-locations"
+  }
+}

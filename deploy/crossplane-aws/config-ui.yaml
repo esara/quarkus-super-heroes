@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: ui-config
 data:
-  port: "8080"
+  quarkus.otel.exporter.otlp.traces.endpoint: "http://alloy.monitoring:4317"
+  calculate.api.base.url: "true"

@@ -5,7 +5,56 @@
   "interactions": [
     {
       "comments": {
-        "testname": "io.quarkus.workshop.superheroes.fight.FightResourceConsumerTest.randomHeroFound()",
+        "testname": "io.quarkus.workshop.superheroes.fight.service.FightServiceConsumerContractTests.helloHeroesSuccess()",
+        "text": [
+
+        ]
+      },
+      "description": "A hello request",
+      "key": "2ec6e2e8",
+      "pending": false,
+      "request": {
+        "headers": {
+          "Accept": [
+            "text/plain"
+          ]
+        },
+        "method": "GET",
+        "path": "/api/heroes/hello"
+      },
+      "response": {
+        "body": {
+          "content": "Hello heroes!",
+          "contentType": "text/plain",
+          "contentTypeHint": "DEFAULT",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "text/plain"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": ".+"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "transport": "https",
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "comments": {
+        "testname": "io.quarkus.workshop.superheroes.fight.service.FightServiceConsumerContractTests.findRandomFighters()",
         "text": [
 
         ]
@@ -27,7 +76,7 @@
           "content": {
             "level": 42,
             "name": "Super Baguette",
-            "picture": "super_baguette.png"
+            "picture": "https://somewhere.com/super_baguette.png"
           },
           "contentType": "application/json",
           "encoded": false
@@ -59,7 +108,8 @@
               "combine": "AND",
               "matchers": [
                 {
-                  "match": "type"
+                  "match": "regex",
+                  "regex": "((http|https):\\/\\/).+"
                 }
               ]
             }
@@ -67,11 +117,12 @@
         },
         "status": 200
       },
+      "transport": "https",
       "type": "Synchronous/HTTP"
     },
     {
       "comments": {
-        "testname": "io.quarkus.workshop.superheroes.fight.FightResourceConsumerTest.shouldGetRandomFighters()",
+        "testname": "io.quarkus.workshop.superheroes.fight.service.FightServiceConsumerContractTests.findRandomFightersHeroNotFound()",
         "text": [
 
         ]
@@ -96,12 +147,13 @@
       "response": {
         "status": 404
       },
+      "transport": "https",
       "type": "Synchronous/HTTP"
     }
   ],
   "metadata": {
     "pact-jvm": {
-      "version": "4.3.17"
+      "version": "4.6.7"
     },
     "pactSpecification": {
       "version": "4.0"

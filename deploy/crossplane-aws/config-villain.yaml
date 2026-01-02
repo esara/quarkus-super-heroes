@@ -3,4 +3,6 @@ kind: ConfigMap
 metadata:
   name: villain-config
 data:
-  port: "8080"
+  quarkus.datasource.username: "super"
+  quarkus.hibernate-orm.schema-management.strategy: "create"
+  quarkus.otel.exporter.otlp.traces.endpoint: "http://alloy.monitoring:4317"

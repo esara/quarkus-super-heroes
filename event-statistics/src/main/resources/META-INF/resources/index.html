@@ -24,9 +24,9 @@
 </head>
 <body>
 <div class="container">
-    <div class="row">
-        <div class="col"><h1 class="page-title">Super Stats</h1></div>
-    </div>
+<div class="row">
+    <div class="col"><h1 class="page-title">Super Stats</h1></div>
+</div>
 </div>
 <div class="container container-cards-pf">
     <div class="row row-cards-pf">
@@ -53,13 +53,16 @@
                 <div class="card-pf-body">
                     <div class="progress-container progress-description-left progress-label-right">
                         <div class="progress-description">
-                            Heroes
+                            <span id="heroProgressLabel">Heroes</span>
                         </div>
                         <div class="progress">
                             <div id="balance" class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%;">
-                                <span>Villains</span>
+                                <span id="villainProgressLabel" class="progress-label-right">Villains</span>
                             </div>
                         </div>
+                        <p>
+                            <span id="numBattles">0 battles</span>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -80,12 +83,13 @@
 
         var top = new WebSocket(protocol + "://" + host + "/stats/winners");
         top.onmessage = function (event) {
+            console.log("[Top Winners Event]: " + event.data);
             updateTop(event.data);
         };
         var team = new WebSocket(protocol + "://" + host + "/stats/team");
         team.onmessage = function(event) {
-            console.log(event.data);
-            updateRatio(event.data);
+            console.log("[Team Stats Event]: " + event.data);
+            updateTeam(JSON.parse(event.data));
         };
     });
 
@@ -97,9 +101,12 @@
         });
     }
 
-    function updateRatio(ratio) {
-        var percent = ratio * 100;
-        $("#balance").attr("aria-valuenow", ratio * 100).attr("style", "width: " + percent + "%;");
+    function updateTeam(teamScore) {
+        var percent = teamScore.heroWinRatio * 100;
+        $("#balance").attr("aria-valuenow", percent).attr("style", "width: " + percent + "%;");
+        $("#heroProgressLabel").text("Heroes (" + teamScore.heroWins + ")");
+        $("#villainProgressLabel").text("Villains (" + teamScore.villainWins + ")")
+        $("#numBattles").text(teamScore.numberOfFights + " battles");
     }
 </script>
 </body>

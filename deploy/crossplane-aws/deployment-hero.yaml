@@ -1,78 +1,111 @@
-apiVersion: "apps/v1"
-kind: "Deployment"
+apiVersion: apps/v1
+kind: Deployment
 metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+    app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+    app.openshift.io/connects-to: "super-dbs,otel-collector"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scheme: http
   labels:
-    app: "quarkus-workshop-hero"
-    version: "01"
-    group: "super-heroes"
-  name: "quarkus-workshop-hero"
+    app.kubernetes.io/name: quarkus-workshop-hero
+    app.kubernetes.io/part-of: heroes-service
+    app.kubernetes.io/version: native-latest
+    app.kubernetes.io/managed-by: quarkus
+  name: quarkus-workshop-heroes
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "quarkus-workshop-hero"
-      version: "01"
-      group: "super-heroes"
+      app.kubernetes.io/name: quarkus-workshop-hero
+      app.kubernetes.io/part-of: heroes-service
   template:
     metadata:
+      annotations:
+        app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+        app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /q/metrics
+        prometheus.io/port: "8080"
+        prometheus.io/scheme: http
       labels:
-        app: "quarkus-workshop-hero"
-        version: "01"
-        group: "super-heroes"
+        app.kubernetes.io/name: quarkus-workshop-hero
+        app.kubernetes.io/part-of: heroes-service
+        app.kubernetes.io/managed-by: quarkus
     spec:
       containers:
-      - image: "esara/quarkus-workshop-hero"
-        imagePullPolicy: "IfNotPresent"
-        name: "quarkus-workshop-hero"
-        ports:
-        - containerPort: 8080
-        env:
-        - name: "KUBERNETES_NAMESPACE"
-          valueFrom:
-            fieldRef:
-              fieldPath: "metadata.namespace"
-        - name: QUARKUS_HTTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: hero-config
-              key: port
-        - name: QUARKUS_DATASOURCE_REACTIVE_URL
-          value: postgresql://$(endpoint):$(port)/hero
-        - name: QUARKUS_DATASOURCE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: heroes-connection-secret
-              key: password
-        envFrom:
-        - secretRef:
-            name: heroes-connection-secret
-        livenessProbe:
-          httpGet:
-            path: /q/health/live
-            port: 8080
-          initialDelaySeconds: 15
-          periodSeconds: 20
-        readinessProbe:
-          httpGet:
-            path: /q/health/ready
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
+        - image: esara/quarkus-workshop-hero
+          imagePullPolicy: IfNotPresent
+          name: quarkus-workshop-hero
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: QUARKUS_DATASOURCE_REACTIVE_URL
+              value: postgresql://$(endpoint):$(port)/super
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: super-dbs-connection-secret
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: hero-config
+            - secretRef:
+                name: super-dbs-connection-secret
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /q/health/started
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            limits:
+              memory: 4Gi
+            requests:
+              memory: 32Mi
 ---
-apiVersion: "v1"
-kind: "Service"
+apiVersion: v1
+kind: Service
 metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+    app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+    app.openshift.io/connects-to: "heroes-db,otel-collector"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scheme: http
   labels:
-    app: "quarkus-workshop-hero"
-    version: "01"
-    group: "super-heroes"
-  name: "quarkus-workshop-hero"
+    app.kubernetes.io/name: quarkus-workshop-hero
+    app.kubernetes.io/part-of: heroes-service
+    app.kubernetes.io/managed-by: quarkus
+  name: quarkus-workshop-hero
 spec:
   ports:
-  - name: "http"
-    port: 8080
+    - name: http
+      port: 8080
   selector:
-    app: "quarkus-workshop-hero"
-    version: "01"
-    group: "super-heroes"
-  type: "ClusterIP"
+    app.kubernetes.io/name: quarkus-workshop-hero
+    app.kubernetes.io/part-of: heroes-service
+  type: ClusterIP

@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native-distroless -t esara/quarkus-workshop-statistic .
+# docker build -f src/main/docker/Dockerfile.native-distroless -t esara/event-statistics .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 esara/quarkus-workshop-statistic
+# docker run -i --rm -p 8080:8080 esara/event-statistics
 #
 ###
 FROM quay.io/quarkus/quarkus-distroless-image:2.0

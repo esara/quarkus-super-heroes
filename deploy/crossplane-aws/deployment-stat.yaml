@@ -1,67 +1,114 @@
-apiVersion: "apps/v1"
-kind: "Deployment"
+apiVersion: apps/v1
+kind: Deployment
 metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+    app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+    app.openshift.io/connects-to: "fights-kafka,apicurio,otel-collector"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8085"
+    prometheus.io/scheme: http
   labels:
-    app: "quarkus-workshop-stat"
-    version: "01"
-    group: "super-heroes"
-  name: "quarkus-workshop-stat"
+    app.kubernetes.io/name: quarkus-workshop-stat
+    app.kubernetes.io/part-of: event-stats
+    app.kubernetes.io/managed-by: quarkus
+  name: quarkus-workshop-stat
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "quarkus-workshop-stat"
-      version: "01"
-      group: "super-heroes"
+      app.kubernetes.io/name: quarkus-workshop-stat
+      app.kubernetes.io/part-of: event-stats
   template:
     metadata:
+      annotations:
+        app.quarkus.io/vcs-ref: main
+        app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+        app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /q/metrics
+        prometheus.io/port: "8085"
+        prometheus.io/scheme: http
       labels:
-        app: "quarkus-workshop-stat"
-        version: "01"
-        group: "super-heroes"
+        app.kubernetes.io/name: quarkus-workshop-stat
+        app.kubernetes.io/part-of: event-stats
+        app.kubernetes.io/managed-by: quarkus
     spec:
       containers:
-      - image: "esara/quarkus-workshop-statistic"
-        imagePullPolicy: "IfNotPresent"
-        name: "quarkus-workshop-stat"
-        ports:
-        - containerPort: 8085
-        env:
-        - name: "KUBERNETES_NAMESPACE"
-          valueFrom:
-            fieldRef:
-              fieldPath: "metadata.namespace"
-        - name: QUARKUS_HTTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: stat-config
-              key: port
-        - name: KAFKA_BOOTSTRAP_SERVERS
-          valueFrom:
-            secretKeyRef:
-              name: kafka-connection-secret
-              key: clusterEndpointScramPublic
-        - name: KAFKA_SECURITY_PROTOCOL
-          value: SASL_SSL
-        - name: KAFKA_SASL_MECHANISM
-          value: SCRAM-SHA-512
-        - name: KAFKA_SASL_JAAS_CONFIG
-          value: org.apache.kafka.common.security.scram.ScramLoginModule required username="${KAFKA_USERNAME:admin}" password="${KAFKA_PASSWORD:quarkus}";
+        - image: esara/quarkus-workshop-statistic
+          imagePullPolicy: IfNotPresent
+          name: quarkus-workshop-stat
+          ports:
+            - containerPort: 8085
+              name: http
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-connection-secret
+                  key: clusterEndpointScramPublic
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: SASL_SSL
+            - name: KAFKA_SASL_MECHANISM
+              value: SCRAM-SHA-512
+            - name: KAFKA_SASL_JAAS_CONFIG
+              value: org.apache.kafka.common.security.scram.ScramLoginModule required username="${KAFKA_USERNAME:admin}" password="${KAFKA_PASSWORD:quarkus}";
+          envFrom:
+            - configMapRef:
+                name: stat-config
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: 8085
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: 8085
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /q/health/started
+              port: 8085
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            limits:
+              memory: 4Gi
+            requests:
+              memory: 32Mi
 ---
-apiVersion: "v1"
-kind: "Service"
+apiVersion: v1
+kind: Service
 metadata:
+  annotations:
+    app.quarkus.io/vcs-ref: main
+    app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+    app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+    app.openshift.io/connects-to: "fights-kafka,apicurio,otel-collector"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8085"
+    prometheus.io/scheme: http
+    alb.ingress.kubernetes.io/healthcheck-path: /q/health/live
   labels:
-    app: "quarkus-workshop-stat"
-    version: "01"
-    group: "super-heroes"
-  name: "quarkus-workshop-stat"
+    app.kubernetes.io/name: quarkus-workshop-stat
+    app.kubernetes.io/part-of: event-stats
+    app.kubernetes.io/managed-by: quarkus
+  name: quarkus-workshop-stat
 spec:
   ports:
-    - name: "http"
+    - name: http
       port: 8085
   selector:
-    app: "quarkus-workshop-stat"
-    version: "01"
-    group: "super-heroes"
+    app.kubernetes.io/name: quarkus-workshop-stat
+    app.kubernetes.io/part-of: event-stats
   type: "NodePort"
