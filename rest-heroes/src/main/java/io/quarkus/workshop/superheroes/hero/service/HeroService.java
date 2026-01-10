@@ -16,8 +16,6 @@ import io.quarkus.workshop.superheroes.hero.mapping.HeroFullUpdateMapper;
 import io.quarkus.workshop.superheroes.hero.mapping.HeroPartialUpdateMapper;
 import io.quarkus.workshop.superheroes.hero.repository.HeroRepository;
 
-import io.opentelemetry.instrumentation.annotations.SpanAttribute;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
@@ -38,40 +36,34 @@ public class HeroService {
     this.heroFullUpdateMapper = heroFullUpdateMapper;
   }
 
-  @WithSpan("HeroService.findAllHeroes")
   public Uni<List<Hero>> findAllHeroes() {
     Log.debug("Getting all heroes");
     return this.heroRepository.listAll();
   }
 
-  @WithSpan("HeroService.findAllHeroesHavingName")
-  public Uni<List<Hero>> findAllHeroesHavingName(@SpanAttribute("arg.name") String name) {
+  public Uni<List<Hero>> findAllHeroesHavingName(String name) {
     Log.debugf("Finding all heroes having name = %s", name);
     return this.heroRepository.listAllWhereNameLike(name);
   }
 
-  @WithSpan("HeroService.findHeroById")
-  public Uni<Hero> findHeroById(@SpanAttribute("arg.id") Long id) {
+  public Uni<Hero> findHeroById(Long id) {
     Log.debugf("Finding hero by id = %d", id);
     return this.heroRepository.findById(id);
   }
 
-  @WithSpan("HeroService.findRandomHero")
   public Uni<Hero> findRandomHero() {
     Log.debug("Finding a random hero");
     return this.heroRepository.findRandom();
   }
 
-  @WithSpan("HeroService.persistHero")
   @WithTransaction
-  public Uni<Hero> persistHero(@SpanAttribute("arg.hero") @NotNull @Valid Hero hero) {
+  public Uni<Hero> persistHero(@NotNull @Valid Hero hero) {
     Log.debugf("Persisting hero: %s", hero);
     return this.heroRepository.persist(hero);
   }
 
-  @WithSpan("HeroService.replaceHero")
   @WithTransaction
-  public Uni<Hero> replaceHero(@SpanAttribute("arg.hero") @NotNull @Valid Hero hero) {
+  public Uni<Hero> replaceHero(@NotNull @Valid Hero hero) {
     Log.debugf("Replacing hero: %s", hero);
     return this.heroRepository.findById(hero.getId())
       .onItem().ifNotNull().transform(h -> {
@@ -80,9 +72,8 @@ public class HeroService {
       });
   }
 
-  @WithSpan("HeroService.partialUpdateHero")
   @WithTransaction
-  public Uni<Hero> partialUpdateHero(@SpanAttribute("arg.hero") @NotNull Hero hero) {
+  public Uni<Hero> partialUpdateHero(@NotNull Hero hero) {
     Log.infof("Partially updating hero: %s", hero);
     return this.heroRepository.findById(hero.getId())
       .onItem().ifNotNull().transform(h -> {
@@ -92,9 +83,8 @@ public class HeroService {
       .onItem().ifNotNull().transform(this::validatePartialUpdate);
   }
 
-  @WithSpan("HeroService.replaceAllHeroes")
   @WithTransaction
-  public Uni<Void> replaceAllHeroes(@SpanAttribute("arg.heroes") List<Hero> heroes) {
+  public Uni<Void> replaceAllHeroes(List<Hero> heroes) {
     Log.debug("Replacing all heroes");
     return deleteAllHeroes()
       .replaceWith(this.heroRepository.persist(heroes));
@@ -116,7 +106,6 @@ public class HeroService {
     return hero;
   }
 
-  @WithSpan("HeroService.deleteAllHeroes")
   @WithTransaction
   public Uni<Void> deleteAllHeroes() {
     Log.debug("Deleting all heroes");
@@ -128,9 +117,8 @@ public class HeroService {
       .replaceWithVoid();
   }
 
-  @WithSpan("HeroService.deleteHero")
   @WithTransaction
-  public Uni<Void> deleteHero(@SpanAttribute("arg.id") Long id) {
+  public Uni<Void> deleteHero(Long id) {
     Log.debugf("Deleting hero by id = %d", id);
     return this.heroRepository.deleteById(id).replaceWithVoid();
   }
