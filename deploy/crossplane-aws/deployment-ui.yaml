@@ -38,7 +38,7 @@ spec:
         app.kubernetes.io/managed-by: quarkus
     spec:
       containers:
-        - image: esara/quarkus-workshop-ui
+        - image: esara/quarkus-workshop-ui:baseimage
           imagePullPolicy: IfNotPresent
           name: quarkus-workshop-ui
           ports:
