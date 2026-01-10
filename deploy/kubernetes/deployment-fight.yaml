@@ -30,7 +30,7 @@ spec:
         app.openshift.io/connects-to: "fights-db,fights-kafka,apicurio,rest-villains,rest-heroes,rest-narration,grpc-locations,otel-collector"
         prometheus.io/scrape: "true"
         prometheus.io/path: /q/metrics
-        prometheus.io/port: "8082"
+        prometheus.io/port: "8080"
         prometheus.io/scheme: http
       labels:
         app.kubernetes.io/name: quarkus-workshop-fight
@@ -106,7 +106,7 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 8082
+      port: 8080
   selector:
     app.kubernetes.io/name: quarkus-workshop-fight
     app.kubernetes.io/part-of: fights-service
