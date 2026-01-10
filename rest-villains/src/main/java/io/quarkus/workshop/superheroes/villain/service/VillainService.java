@@ -20,9 +20,6 @@ import io.quarkus.workshop.superheroes.villain.config.VillainConfig;
 import io.quarkus.workshop.superheroes.villain.mapping.VillainFullUpdateMapper;
 import io.quarkus.workshop.superheroes.villain.mapping.VillainPartialUpdateMapper;
 
-import io.opentelemetry.instrumentation.annotations.SpanAttribute;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
-
 /**
  * Service class containing business methods for the application.
  */
@@ -42,7 +39,6 @@ public class VillainService {
   VillainFullUpdateMapper villainFullUpdateMapper;
 
 	@Transactional(SUPPORTS)
-  @WithSpan("VillainService.findAllVillains")
 	public List<Villain> findAllVillains() {
     Log.debug("Getting all villains");
     return Optional.ofNullable(Villain.<Villain>listAll())
@@ -50,29 +46,25 @@ public class VillainService {
 	}
 
   @Transactional(SUPPORTS)
-  @WithSpan("VillainService.findAllVillainsHavingName")
-  public List<Villain> findAllVillainsHavingName(@SpanAttribute("arg.name") String name) {
+  public List<Villain> findAllVillainsHavingName(String name) {
     Log.debugf("Finding all villains having name = %s", name);
     return Optional.ofNullable(Villain.listAllWhereNameLike(name))
       .orElseGet(List::of);
   }
 
   @Transactional(SUPPORTS)
-  @WithSpan("VillainService.findVillainById")
-  public Optional<Villain> findVillainById(@SpanAttribute("arg.id") Long id) {
+  public Optional<Villain> findVillainById(Long id) {
     Log.debugf("Finding villain by id = %d", id);
     return Villain.findByIdOptional(id);
   }
 
 	@Transactional(SUPPORTS)
-  @WithSpan("VillainService.findRandomVillain")
 	public Optional<Villain> findRandomVillain() {
     Log.debug("Finding a random villain");
 		return Villain.findRandom();
 	}
 
-  @WithSpan("VillainService.persistVillain")
-	public Villain persistVillain(@SpanAttribute("arg.villain") @NotNull @Valid Villain villain) {
+	public Villain persistVillain(@NotNull @Valid Villain villain) {
     Log.debugf("Persisting villain: %s", villain);
 		villain.level = (int) Math.round(villain.level * this.villainConfig.level().multiplier());
 		Villain.persist(villain);
@@ -80,8 +72,7 @@ public class VillainService {
 		return villain;
 	}
 
-  @WithSpan("VillainService.replaceVillain")
-	public Optional<Villain> replaceVillain(@SpanAttribute("arg.villain") @NotNull @Valid Villain villain) {
+	public Optional<Villain> replaceVillain(@NotNull @Valid Villain villain) {
     Log.debugf("Replacing villain: %s", villain);
 		return Villain.findByIdOptional(villain.id)
 			.map(Villain.class::cast) // Only here for type erasure within the IDE
@@ -91,8 +82,7 @@ public class VillainService {
 			});
 	}
 
-  @WithSpan("VillainService.partialUpdateVillain")
-	public Optional<Villain> partialUpdateVillain(@SpanAttribute("arg.villain") @NotNull Villain villain) {
+	public Optional<Villain> partialUpdateVillain(@NotNull Villain villain) {
     Log.debugf("Partially updating villain: %s", villain);
 		return Villain.findByIdOptional(villain.id)
 			.map(Villain.class::cast) // Only here for type erasure within the IDE
@@ -103,8 +93,7 @@ public class VillainService {
 			.map(this::validatePartialUpdate);
 	}
 
-  @WithSpan("VillainService.replaceAllVillains")
-  public void replaceAllVillains(@SpanAttribute("arg.villains") List<Villain> villains) {
+  public void replaceAllVillains(List<Villain> villains) {
     Log.debug("Replacing all villains");
     deleteAllVillains();
     Villain.persist(villains);
@@ -126,7 +115,6 @@ public class VillainService {
 		return villain;
 	}
 
-  @WithSpan("VillainService.deleteAllVillains")
 	public void deleteAllVillains() {
     Log.debug("Deleting all villains");
 		List<Villain> villains = Villain.listAll();
@@ -135,8 +123,7 @@ public class VillainService {
 			.forEach(this::deleteVillain);
 	}
 
-  @WithSpan("VillainService.deleteVillain")
-	public void deleteVillain(@SpanAttribute("arg.id") Long id) {
+	public void deleteVillain(Long id) {
     Log.debugf("Deleting villain by id = %d", id);
 		Villain.deleteById(id);
 	}
