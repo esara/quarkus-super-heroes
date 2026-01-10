@@ -17,8 +17,6 @@ import io.quarkus.rest.client.reactive.runtime.MicroProfileRestClientRequestFilt
 
 import io.quarkus.workshop.superheroes.fight.config.FightConfig;
 
-import io.opentelemetry.api.trace.SpanKind;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.faulttolerance.api.CircuitBreakerName;
 import io.smallrye.mutiny.Uni;
 
@@ -46,7 +44,6 @@ public class VillainClient {
   @CircuitBreaker(requestVolumeThreshold = 8, failureRatio = 0.5, delay = 2, delayUnit = ChronoUnit.SECONDS)
   @CircuitBreakerName("findRandomVillain")
   @Retry(maxRetries = 3, delay = 200, delayUnit = ChronoUnit.MILLIS)
-  @WithSpan(kind = SpanKind.CLIENT, value = "VillainClient.findRandomVillain")
   public Uni<Villain> findRandomVillain() {
     // Want the 404 handling to be part of the circuit breaker
     // This means that the 404 responses aren't considered errors by the circuit breaker
@@ -65,7 +62,6 @@ public class VillainClient {
    * Calls hello on the Villains service.
    * @return A "hello" from Villains
    */
-  @WithSpan(kind = SpanKind.CLIENT, value = "VillainClient.helloVillains")
   public Uni<String> helloVillains() {
     var target =this.villainClient.path("hello");
     Log.debugf("Going to make request to %s", target.getUri());
