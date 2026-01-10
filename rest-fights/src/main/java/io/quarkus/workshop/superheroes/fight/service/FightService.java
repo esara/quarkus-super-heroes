@@ -37,8 +37,6 @@ import io.quarkus.workshop.superheroes.fight.repository.FightRepository;
 
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 
-import io.opentelemetry.instrumentation.annotations.SpanAttribute;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.faulttolerance.api.CircuitBreakerName;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.MutinyEmitter;
@@ -84,21 +82,18 @@ public class FightService {
 		       fighters;
 	}
 
-  @WithSpan("FightService.findAllFights")
 	public Uni<List<Fight>> findAllFights() {
     Log.debug("Getting all fights");
 		return this.fightRepository.listAll();
 	}
 
-  @WithSpan("FightService.findFightById")
-	public Uni<Fight> findFightById(@SpanAttribute("arg.id") Long id) {
+	public Uni<Fight> findFightById(Long id) {
     Log.debugf("Finding fight by id = %d", id);
 		return this.fightRepository.findById(id);
 	}
 
 	@Timeout(value = 4, unit = ChronoUnit.SECONDS)
   @Fallback(fallbackMethod = "fallbackRandomFighters")
-  @WithSpan("FightService.findRandomFighters")
 	public Uni<Fighters> findRandomFighters() {
     Log.debug("Finding random fighters");
 
@@ -143,7 +138,6 @@ public class FightService {
 
   @Timeout(value = 5, unit = ChronoUnit.SECONDS)
   @Fallback(fallbackMethod = "fallbackHelloHeroes")
-  @WithSpan("FightService.helloHeroes")
   public Uni<String> helloHeroes() {
     Log.debug("Pinging heroes service");
     return this.heroClient.helloHeroes()
@@ -152,7 +146,6 @@ public class FightService {
 
   @Timeout(value = 5, unit = ChronoUnit.SECONDS)
   @Fallback(fallbackMethod = "fallbackHelloNarration")
-  @WithSpan("FightService.helloNarration")
   public Uni<String> helloNarration() {
     Log.debug("Pinging narration service");
     return this.narrationClient.hello()
@@ -161,7 +154,6 @@ public class FightService {
 
 	@Timeout(value = 5, unit = ChronoUnit.SECONDS)
 	@Fallback(fallbackMethod = "fallbackHelloLocations")
-	@WithSpan("FightService.helloLocations")
 	public Uni<String> helloLocations() {
 		Log.debug("Pinging location service");
 		return this.locationClient.helloLocations()
@@ -190,7 +182,6 @@ public class FightService {
 
   @Timeout(value = 5, unit = ChronoUnit.SECONDS)
   @Fallback(fallbackMethod = "fallbackHelloVillains")
-  @WithSpan("FightService.helloVillains")
   public Uni<String> helloVillains() {
     Log.debug("Pinging villains service");
     return this.villainClient.helloVillains()
@@ -255,8 +246,7 @@ public class FightService {
 		);
 	}
 
-  @WithSpan("FightService.performFight")
-	public Uni<Fight> performFight(@SpanAttribute("arg.fighters") @NotNull @Valid FightRequest fightRequest) {
+	public Uni<Fight> performFight(@NotNull @Valid FightRequest fightRequest) {
     Log.debugf("Performing a fight with fighters: %s", fightRequest);
     return determineWinner(fightRequest)
       .chain(this::persistFight);
@@ -267,8 +257,7 @@ public class FightService {
   @Timeout(value = 30, unit = ChronoUnit.SECONDS)
   @Retry(maxRetries = 3, delay = 200, delayUnit = ChronoUnit.MILLIS)
 	@Fallback(fallbackMethod = "fallbackNarrateFight")
-  @WithSpan("FightService.narrateFight")
-  public Uni<String> narrateFight(@SpanAttribute("arg.fight") FightToNarrate fight) {
+  public Uni<String> narrateFight(FightToNarrate fight) {
     Log.debugf("Narrating fight: %s", fight);
     return this.narrationClient.narrate(fight);
   }
@@ -278,15 +267,13 @@ public class FightService {
   @Timeout(value = 30, unit = ChronoUnit.SECONDS)
   @Retry(maxRetries = 3, delay = 200, delayUnit = ChronoUnit.MILLIS)
 	@Fallback(fallbackMethod = "fallbackGenerateImageFromNarration")
-  @WithSpan("FightService.generateImageFromNarration")
-  public Uni<FightImage> generateImageFromNarration(@SpanAttribute("arg.narration") String narration) {
+  public Uni<FightImage> generateImageFromNarration(String narration) {
     Log.debugf("Generating image for narration: %s", narration);
     return this.narrationClient.generateImageFromNarration(narration);
   }
 
-  @WithSpan("FightService.persistFight")
 	@WithTransaction
-	Uni<Fight> persistFight(@SpanAttribute("arg.fight") Fight fight) {
+	Uni<Fight> persistFight(Fight fight) {
     Log.debugf("Persisting a fight: %s", fight);
 		return this.fightRepository.persist(fight)
       .replaceWith(fight)
@@ -295,7 +282,7 @@ public class FightService {
       .replaceWith(fight);
 	}
 
-	Uni<Fight> determineWinner(@SpanAttribute("arg.fighters") FightRequest fightRequest) {
+	Uni<Fight> determineWinner(FightRequest fightRequest) {
     Log.debugf("Determining winner between fighters: %s", fightRequest);
 
 		// Amazingly fancy logic to determine the winner...
