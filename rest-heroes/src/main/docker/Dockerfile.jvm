@@ -88,6 +88,11 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
 
 # We make four distinct layers so if there are application changes the library layers can be re-used
+# OBI agent: buildx sets TARGETARCH per platform; pick the matching JAR (amd64→x86_64, arm64→arm64)
+ARG TARGETARCH
+COPY --chown=185 obi-java-agent-x86_64.jar obi-java-agent-arm64.jar /deployments/
+RUN case "$TARGETARCH" in amd64) mv /deployments/obi-java-agent-x86_64.jar /deployments/obi-java-agent.jar ;; arm64) mv /deployments/obi-java-agent-arm64.jar /deployments/obi-java-agent.jar ;; *) echo "Unsupported TARGETARCH=$TARGETARCH" && exit 1 ;; esac \
+  && rm -f /deployments/obi-java-agent-x86_64.jar /deployments/obi-java-agent-arm64.jar
 COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
 COPY --chown=185 target/quarkus-app/*.jar /deployments/
 COPY --chown=185 target/quarkus-app/app/ /deployments/app/
@@ -95,5 +100,5 @@ COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
 
 EXPOSE 8080
 USER 185
-ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -javaagent:/deployments/obi-java-agent.jar"
 ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
