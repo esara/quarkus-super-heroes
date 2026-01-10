@@ -13,8 +13,6 @@ import io.quarkus.workshop.superheroes.narration.ImageGenerationRequest;
 import dev.langchain4j.data.image.Image;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import io.opentelemetry.instrumentation.annotations.SpanAttribute;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkiverse.langchain4j.RegisterAiService;
 
 @RegisterAiService
@@ -38,8 +36,7 @@ public interface ImageGenerationService {
     """)
   Image generateImage(ImageGenerationRequest request);
 
-  @WithSpan("ImageGenerationService.generateImageForNarration")
-  default FightImage generateImageForNarration(@SpanAttribute("arg.request") ImageGenerationRequest request) {
+  default FightImage generateImageForNarration(ImageGenerationRequest request) {
     Log.debugf("Generating image for request: %s", request);
 
     var image = generateImage(request);
