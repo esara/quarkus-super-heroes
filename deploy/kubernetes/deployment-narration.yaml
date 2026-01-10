@@ -38,7 +38,7 @@ spec:
         app.kubernetes.io/managed-by: quarkus
     spec:
       containers:
-        - image: esara/quarkus-workshop-narration
+        - image: esara/quarkus-workshop-narration:baseimage
           imagePullPolicy: IfNotPresent
           name: quarkus-workshop-narration
           ports:
