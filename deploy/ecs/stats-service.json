@@ -75,7 +75,7 @@
                 "ContainerDefinitions": [
                     {
                         "Name": "quarkus-workshop-stat",
-                        "Image": "esara/quarkus-workshop-statistic",
+                        "Image": "esara/quarkus-workshop-statistic:baseimage",
                         "Essential": true,
                         "PortMappings": [
                             { "ContainerPort": 8080, "Protocol": "tcp" }

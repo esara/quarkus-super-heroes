@@ -275,7 +275,7 @@
                 "ContainerDefinitions": [
                     {
                         "Name": "quarkus-workshop-ui",
-                        "Image": "esara/quarkus-workshop-ui",
+                        "Image": "esara/quarkus-workshop-ui:baseimage",
                         "Essential": true,
                         "PortMappings": [
                             { "ContainerPort": 8080, "Protocol": "tcp" }

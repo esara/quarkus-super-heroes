@@ -79,7 +79,7 @@
                 "ContainerDefinitions": [
                     {
                         "Name": "quarkus-workshop-hero",
-                        "Image": "esara/quarkus-workshop-hero",
+                        "Image": "esara/quarkus-workshop-hero:baseimage",
                         "Essential": true,
                         "PortMappings": [
                             { "ContainerPort": 8080, "Protocol": "tcp", "Name": "hero-port" }

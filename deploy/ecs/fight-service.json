@@ -79,7 +79,7 @@
                 "ContainerDefinitions": [
                     {
                         "Name": "quarkus-workshop-fight",
-                        "Image": "esara/quarkus-workshop-fight",
+                        "Image": "esara/quarkus-workshop-fight:baseimage",
                         "Essential": true,
                         "PortMappings": [
                             { "ContainerPort": 8080, "Protocol": "tcp", "Name": "fight-port" }
