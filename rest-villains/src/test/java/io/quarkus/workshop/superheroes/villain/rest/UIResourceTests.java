@@ -21,6 +21,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import io.quarkiverse.playwright.InjectPlaywright;
 import io.quarkiverse.playwright.WithPlaywright;
 
@@ -74,8 +75,10 @@ class UIResourceTests {
     var page = loadPage();
     getAndVerifyTable(page, NB_VILLAINS);
 
-    // Fill in the filter
-    page.getByPlaceholder("Filter by name").fill(DARTH_VADER.name);
+    // Wait for the filter input to be visible and fill it
+    var filterInput = page.getByPlaceholder("Filter by name");
+    filterInput.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    filterInput.fill(DARTH_VADER.name);
 
     // Click the filter button
     page.getByText("Filter Villains").click();
@@ -117,12 +120,17 @@ class UIResourceTests {
 
   private Page loadPage() {
     var page = this.browserContext.newPage();
+    // Set a large viewport to ensure toolbar elements are visible (pf-m-show-on-xl)
+    page.setViewportSize(1920, 1080);
     var response = page.navigate(this.index.toString());
 
     assertThat(response)
       .isNotNull()
       .extracting(Response::status)
       .isEqualTo(Status.OK.getStatusCode());
+
+    // Wait for page to be fully loaded
+    page.waitForLoadState();
 
     return page;
   }
