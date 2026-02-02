@@ -135,7 +135,7 @@
                 "VpcId": {
                     "Ref": "VpcID"
                 },
-                "HealthCheckPath": "/",
+                "HealthCheckPath": "/q/health/live",
                 "HealthCheckProtocol": "HTTP",
                 "HealthCheckIntervalSeconds": 30,
                 "HealthCheckTimeoutSeconds": 5,
@@ -183,7 +183,7 @@
                 "VpcId": {
                     "Ref": "VpcID"
                 },
-                "HealthCheckPath": "/",
+                "HealthCheckPath": "/q/health/live",
                 "HealthCheckProtocol": "HTTP",
                 "HealthCheckIntervalSeconds": 30,
                 "HealthCheckTimeoutSeconds": 5,
@@ -281,7 +281,8 @@
                             { "ContainerPort": 8080, "Protocol": "tcp" }
                         ],
                         "Environment": [
-                            { "Name": "QUARKUS_HTTP_PORT", "Value": "8080" }
+                            { "Name": "QUARKUS_HTTP_PORT", "Value": "8080" },
+                            { "Name": "CALCULATE_API_BASE_URL", "Value": "true" }
                         ],
                         "LogConfiguration": {
                             "LogDriver": "awslogs",
@@ -292,7 +293,7 @@
                             }
                         },
                         "HealthCheck": {
-                            "Command": ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"],
+                            "Command": ["CMD-SHELL", "curl -fsS http://localhost:8080/q/health/live || exit 1"],
                             "Interval": 30,
                             "Timeout": 5,
                             "Retries": 3,
