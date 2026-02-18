@@ -237,9 +237,9 @@ class FightResourceIT {
 
     // Configure Avro Serde for Fight
     companion.setCommonClientConfig(Map.of(AvroKafkaSerdeConfig.AVRO_DATUM_PROVIDER, ReflectAvroDatumProvider.class.getName()));
-    Serde<io.quarkus.sample.superheroes.fight.schema.Fight> serde = Serdes.serdeFrom(new AvroKafkaSerializer<>(), new AvroKafkaDeserializer<>());
+    Serde<io.quarkus.workshop.superheroes.fight.schema.Fight> serde = Serdes.serdeFrom(new AvroKafkaSerializer<>(), new AvroKafkaDeserializer<>());
     serde.configure(companion.getCommonClientConfig(), false);
-    companion.registerSerde(io.quarkus.sample.superheroes.fight.schema.Fight.class, serde);
+    companion.registerSerde(io.quarkus.workshop.superheroes.fight.schema.Fight.class, serde);
 	}
 
 	@Test
@@ -1245,7 +1245,7 @@ class FightResourceIT {
 	@Test
 	@Order(DEFAULT_ORDER + 2)
 	void performFightHeroWins() {
-    var fights = companion.consume(io.quarkus.sample.superheroes.fight.schema.Fight.class)
+    var fights = companion.consume(io.quarkus.workshop.superheroes.fight.schema.Fight.class)
       .withOffsetReset(OffsetResetStrategy.EARLIEST)
       .withGroupId("fights")
       .withAutoCommit()
@@ -1294,14 +1294,14 @@ class FightResourceIT {
 		assertThat(fight)
 			.isNotNull()
 			.extracting(
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerName,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerLevel,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerPicture,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerTeam,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserName,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserLevel,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserPicture,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserTeam
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerName,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerLevel,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerPicture,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerTeam,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserName,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserLevel,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserPicture,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserTeam
 			)
 			.containsExactly(
 				DEFAULT_HERO.name(),
@@ -1318,7 +1318,7 @@ class FightResourceIT {
 	@Test
 	@Order(DEFAULT_ORDER + 3)
 	void performFightVillainWins() {
-    var fights = companion.consume(io.quarkus.sample.superheroes.fight.schema.Fight.class)
+    var fights = companion.consume(io.quarkus.workshop.superheroes.fight.schema.Fight.class)
       .withOffsetReset(OffsetResetStrategy.EARLIEST)
       .withGroupId("fights")
       .withAutoCommit()
@@ -1383,14 +1383,14 @@ class FightResourceIT {
 		assertThat(fight)
 			.isNotNull()
 			.extracting(
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerName,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerLevel,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerPicture,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerTeam,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserName,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserLevel,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserPicture,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserTeam
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerName,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerLevel,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerPicture,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerTeam,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserName,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserLevel,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserPicture,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserTeam
 			)
 			.containsExactly(
 				DEFAULT_VILLAIN.name(),

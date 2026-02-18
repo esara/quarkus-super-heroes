@@ -41,7 +41,7 @@ import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.quarkus.test.kafka.InjectKafkaCompanion;
 import io.quarkus.test.kafka.KafkaCompanionResource;
 
-import io.quarkus.sample.superheroes.fight.schema.Fight;
+import io.quarkus.workshop.superheroes.fight.schema.Fight;
 import io.quarkus.workshop.superheroes.statistics.domain.TeamScore;
 
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
@@ -110,7 +110,7 @@ class WebSocketsIT {
     companion.setCommonClientConfig(Map.of(AvroKafkaSerdeConfig.AVRO_DATUM_PROVIDER, ReflectAvroDatumProvider.class.getName()));
     Serde<Fight> serde = Serdes.serdeFrom(new AvroKafkaSerializer<>(), new AvroKafkaDeserializer<>());
     serde.configure(companion.getCommonClientConfig(), false);
-    companion.registerSerde(io.quarkus.sample.superheroes.fight.schema.Fight.class, serde);
+    companion.registerSerde(io.quarkus.workshop.superheroes.fight.schema.Fight.class, serde);
   }
 
 	@Test

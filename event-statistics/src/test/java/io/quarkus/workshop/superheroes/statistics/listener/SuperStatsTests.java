@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectSpy;
 
-import io.quarkus.sample.superheroes.fight.schema.Fight;
+import io.quarkus.workshop.superheroes.fight.schema.Fight;
 import io.quarkus.workshop.superheroes.statistics.domain.Score;
 import io.quarkus.workshop.superheroes.statistics.domain.TeamScore;
 

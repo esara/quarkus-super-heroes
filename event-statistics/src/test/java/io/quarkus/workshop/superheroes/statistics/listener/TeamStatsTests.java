@@ -6,7 +6,7 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkus.sample.superheroes.fight.schema.Fight;
+import io.quarkus.workshop.superheroes.fight.schema.Fight;
 import io.quarkus.workshop.superheroes.statistics.domain.TeamScore;
 
 /**

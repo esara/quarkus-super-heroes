@@ -12,7 +12,7 @@ import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import io.quarkus.logging.Log;
 import io.quarkus.opentelemetry.runtime.QuarkusContextStorage;
 
-import io.quarkus.sample.superheroes.fight.schema.Fight;
+import io.quarkus.workshop.superheroes.fight.schema.Fight;
 import io.quarkus.workshop.superheroes.statistics.domain.Score;
 import io.quarkus.workshop.superheroes.statistics.domain.TeamScore;
 
@@ -51,7 +51,7 @@ public class SuperStats {
   }
 
   /**
-   * Processes a stream of {@link Fight}s. Computes {@link #computeTeamStats(io.quarkus.sample.superheroes.fight.schema.Fight) team stats}
+   * Processes a stream of {@link Fight}s. Computes {@link #computeTeamStats(io.quarkus.workshop.superheroes.fight.schema.Fight) team stats}
    * and {@link #computeTopWinners(io.smallrye.mutiny.Multi) top winners}
    * @param fights
    * @return
