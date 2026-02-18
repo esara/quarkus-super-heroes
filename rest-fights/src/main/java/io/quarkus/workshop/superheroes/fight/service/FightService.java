@@ -52,13 +52,13 @@ public class FightService {
 	private final VillainClient villainClient;
   private final NarrationClient narrationClient;
 	private final LocationClient locationClient;
-	private final MutinyEmitter<io.quarkus.sample.superheroes.fight.schema.Fight> emitter;
+	private final MutinyEmitter<io.quarkus.workshop.superheroes.fight.schema.Fight> emitter;
 	private final FightConfig fightConfig;
   private final FightMapper fightMapper;
 	private final FightRepository fightRepository;
 	private final Random random = new Random();
 
-	public FightService(HeroClient heroClient, VillainClient villainClient, @RestClient NarrationClient narrationClient, LocationClient locationClient, @Channel("fights") MutinyEmitter<io.quarkus.sample.superheroes.fight.schema.Fight> emitter, FightConfig fightConfig, FightMapper fightMapper, FightRepository fightRepository) {
+	public FightService(HeroClient heroClient, VillainClient villainClient, @RestClient NarrationClient narrationClient, LocationClient locationClient, @Channel("fights") MutinyEmitter<io.quarkus.workshop.superheroes.fight.schema.Fight> emitter, FightConfig fightConfig, FightMapper fightMapper, FightRepository fightRepository) {
 		this.heroClient = heroClient;
 		this.villainClient = villainClient;
     this.narrationClient = narrationClient;

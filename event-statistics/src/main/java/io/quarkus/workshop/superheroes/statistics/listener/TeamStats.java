@@ -1,6 +1,6 @@
 package io.quarkus.workshop.superheroes.statistics.listener;
 
-import io.quarkus.sample.superheroes.fight.schema.Fight;
+import io.quarkus.workshop.superheroes.fight.schema.Fight;
 import io.quarkus.workshop.superheroes.statistics.domain.TeamScore;
 
 /**

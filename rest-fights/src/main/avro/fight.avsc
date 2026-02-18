@@ -1,5 +1,5 @@
 {
-  "namespace": "io.quarkus.sample.superheroes.fight.schema",
+  "namespace": "io.quarkus.workshop.superheroes.fight.schema",
   "doc": "Fight entity",
   "type": "record",
   "name": "Fight",

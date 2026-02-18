@@ -32,16 +32,16 @@ class FightMapperTests {
 
     assertThat(fight)
       .extracting(
-        io.quarkus.sample.superheroes.fight.schema.Fight::getId,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getFightDate,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerName,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerLevel,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerPicture,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserName,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserLevel,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserPicture,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getWinnerTeam,
-        io.quarkus.sample.superheroes.fight.schema.Fight::getLoserTeam
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getId,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getFightDate,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerName,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerLevel,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerPicture,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserName,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserLevel,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserPicture,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getWinnerTeam,
+        io.quarkus.workshop.superheroes.fight.schema.Fight::getLoserTeam
       )
       .containsExactly(
         DEFAULT_FIGHT_ID.toString(),
