@@ -11,6 +11,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -34,10 +35,12 @@ public class Fight {
 	@NotNull
 	public Integer winnerLevel;
 
-  @NotEmpty
-  public String winnerPowers;
+	@NotEmpty
+	@Lob
+	public String winnerPowers;
 
 	@NotEmpty
+	@Lob
 	public String winnerPicture;
 
 	@NotEmpty
@@ -46,10 +49,12 @@ public class Fight {
 	@NotNull
 	public Integer loserLevel;
 
-  @NotEmpty
-  public String loserPowers;
+	@NotEmpty
+	@Lob
+	public String loserPowers;
 
 	@NotEmpty
+	@Lob
 	public String loserPicture;
 
 	@NotEmpty
