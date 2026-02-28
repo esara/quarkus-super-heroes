@@ -51,7 +51,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import io.apicurio.registry.rest.client.RegistryClientFactory;
 import io.apicurio.registry.serde.avro.AvroKafkaDeserializer;
-import io.apicurio.registry.serde.avro.AvroKafkaSerdeConfig;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import io.apicurio.registry.serde.avro.ReflectAvroDatumProvider;
 import io.apicurio.rest.client.VertxHttpClientProvider;
@@ -107,7 +106,7 @@ class WebSocketsIT {
   @BeforeEach
   void beforeEach() {
     // Configure Avro Serde for Fight
-    companion.setCommonClientConfig(Map.of(AvroKafkaSerdeConfig.AVRO_DATUM_PROVIDER, ReflectAvroDatumProvider.class.getName()));
+    companion.setCommonClientConfig(Map.of("apicurio.registry.avro-datum-provider", ReflectAvroDatumProvider.class.getName()));
     Serde<Fight> serde = Serdes.serdeFrom(new AvroKafkaSerializer<>(), new AvroKafkaDeserializer<>());
     serde.configure(companion.getCommonClientConfig(), false);
     companion.registerSerde(io.quarkus.workshop.superheroes.fight.schema.Fight.class, serde);
