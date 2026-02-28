@@ -69,7 +69,6 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.apicurio.registry.rest.client.RegistryClientFactory;
 import io.apicurio.registry.serde.avro.AvroKafkaDeserializer;
-import io.apicurio.registry.serde.avro.AvroKafkaSerdeConfig;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import io.apicurio.registry.serde.avro.ReflectAvroDatumProvider;
 import io.apicurio.rest.client.VertxHttpClientProvider;
@@ -236,7 +235,7 @@ class FightResourceIT {
     this.wireMockGrpc.resetAll();
 
     // Configure Avro Serde for Fight
-    companion.setCommonClientConfig(Map.of(AvroKafkaSerdeConfig.AVRO_DATUM_PROVIDER, ReflectAvroDatumProvider.class.getName()));
+    companion.setCommonClientConfig(Map.of("apicurio.registry.avro-datum-provider", ReflectAvroDatumProvider.class.getName()));
     Serde<io.quarkus.workshop.superheroes.fight.schema.Fight> serde = Serdes.serdeFrom(new AvroKafkaSerializer<>(), new AvroKafkaDeserializer<>());
     serde.configure(companion.getCommonClientConfig(), false);
     companion.registerSerde(io.quarkus.workshop.superheroes.fight.schema.Fight.class, serde);
