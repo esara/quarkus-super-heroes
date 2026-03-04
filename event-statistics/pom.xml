@@ -145,7 +145,7 @@
     <dependency>
       <groupId>io.apicurio</groupId>
       <artifactId>apicurio-common-rest-client-vertx</artifactId>
-      <version>0.1.11.Final</version>
+      <version>0.1.18.Final</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
