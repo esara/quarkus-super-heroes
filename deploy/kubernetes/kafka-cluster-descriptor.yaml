@@ -13,7 +13,7 @@ spec:
     type: ephemeral
   template:
     pod:
-     tmpDirSizeLimit: 100Mi
+      tmpDirSizeLimit: 100Mi
 #---
 #apiVersion: kafka.strimzi.io/v1beta2
 #kind: KafkaNodePool
