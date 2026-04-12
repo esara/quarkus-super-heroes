@@ -1,30 +1,79 @@
+---
 apiVersion: rds.aws.crossplane.io/v1alpha1
-kind: DBInstance
+kind: DBCluster
 metadata:
   name: super
 spec:
   forProvider:
     region: us-east-2
-    allocatedStorage: 20
-    autogeneratePassword: true
-    backupRetentionPeriod: 0
-    dbInstanceClass: db.t4g.micro # needs to support engine and -version (see AWS Docs: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html#Concepts.DBInstanceClass.Support)
-    dbName: super
-    engine: postgres
-    engineVersion: "18.1"
-    allowMajorVersionUpgrade: true # unset per default (Note: supported dbInstanceClass and dbParameterGroup with correct dbParameterGroupFamily needed, before majorVersion upgrade possible; applyImmediately matters)
+    engine: aurora-postgresql
+    engineVersion: "17.7"
+    engineMode: provisioned
+    databaseName: super
     masterUsername: super
+    autogeneratePassword: true
     masterUserPasswordSecretRef:
       key: password
       name: super-secret
       namespace: crossplane-system
+    serverlessV2ScalingConfiguration:
+      minCapacity: 0.5
+      maxCapacity: 16
+    availabilityZones:
+      - us-east-2a
+      - us-east-2b
+      - us-east-2c
+    backupRetentionPeriod: 1
     preferredBackupWindow: "07:00-08:00"
     preferredMaintenanceWindow: "sat:08:00-sat:11:00"
     publiclyAccessible: true
     skipFinalSnapshot: true
     applyImmediately: true
+    allowMajorVersionUpgrade: true
   publishConnectionDetailsTo:
     name: default
   writeConnectionSecretToRef:
     name: super-dbs-connection-secret
     namespace: quarkus-super-heroes
+---
+apiVersion: rds.aws.crossplane.io/v1alpha1
+kind: DBInstance
+metadata:
+  name: super-aurora-writer
+spec:
+  forProvider:
+    region: us-east-2
+    engine: aurora-postgresql
+    dbInstanceClass: db.serverless
+    dbClusterIdentifier: super
+    availabilityZone: us-east-2a
+    publiclyAccessible: true
+    applyImmediately: true
+---
+apiVersion: rds.aws.crossplane.io/v1alpha1
+kind: DBInstance
+metadata:
+  name: super-aurora-reader-1
+spec:
+  forProvider:
+    region: us-east-2
+    engine: aurora-postgresql
+    dbInstanceClass: db.serverless
+    dbClusterIdentifier: super
+    availabilityZone: us-east-2b
+    publiclyAccessible: true
+    applyImmediately: true
+---
+apiVersion: rds.aws.crossplane.io/v1alpha1
+kind: DBInstance
+metadata:
+  name: super-aurora-reader-2
+spec:
+  forProvider:
+    region: us-east-2
+    engine: aurora-postgresql
+    dbInstanceClass: db.serverless
+    dbClusterIdentifier: super
+    availabilityZone: us-east-2c
+    publiclyAccessible: true
+    applyImmediately: true
