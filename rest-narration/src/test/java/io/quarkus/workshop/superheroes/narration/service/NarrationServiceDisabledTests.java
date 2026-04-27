@@ -47,6 +47,8 @@ class NarrationServiceDisabledTests {
     @Override
     public Map<String, String> getConfigOverrides() {
       return Map.of(
+         "quarkus.langchain4j.anthropic.enable-integration", "false",
+         "quarkus.langchain4j.ai.gemini.enable-integration", "false",
          "quarkus.langchain4j.openai.enable-integration", "false",
          "quarkus.langchain4j.azure-openai.enable-integration", "false"
       );
