@@ -11,16 +11,18 @@ import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit5.virtual.ShouldNotPin;
-import io.quarkus.test.junit5.virtual.VirtualThreadUnit;
+import io.quarkus.test.junit.virtual.ShouldNotPin;
+import io.quarkus.test.junit.virtual.VirtualThreadUnit;
 
 import io.quarkus.workshop.superheroes.villain.Villain;
 
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Locator.WaitForOptions;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import io.quarkiverse.playwright.InjectPlaywright;
 import io.quarkiverse.playwright.WithPlaywright;
@@ -75,10 +77,11 @@ class UIResourceTests {
     var page = loadPage();
     getAndVerifyTable(page, NB_VILLAINS);
 
-    // Wait for the filter input to be visible and fill it
-    var filterInput = page.getByPlaceholder("Filter by name");
-    filterInput.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-    filterInput.fill(DARTH_VADER.name);
+    // Fill in the filter
+    var filterByName = page.getByPlaceholder("Filter by name");
+    filterByName.waitFor(new WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    filterByName.scrollIntoViewIfNeeded();
+    filterByName.fill(DARTH_VADER.name);
 
     // Click the filter button
     page.getByText("Filter Villains").click();
@@ -120,8 +123,10 @@ class UIResourceTests {
 
   private Page loadPage() {
     var page = this.browserContext.newPage();
-    // Set a large viewport to ensure toolbar elements are visible (pf-m-show-on-xl)
-    page.setViewportSize(1920, 1080);
+
+    // Force a desktop viewport so responsive toolbars don't collapse inputs into overflow menus
+    page.setViewportSize(1280, 800);
+
     var response = page.navigate(this.index.toString());
 
     assertThat(response)
@@ -129,8 +134,8 @@ class UIResourceTests {
       .extracting(Response::status)
       .isEqualTo(Status.OK.getStatusCode());
 
-    // Wait for page to be fully loaded
-    page.waitForLoadState();
+    // Make sure initial render has happened before tests start interacting
+    page.waitForLoadState(LoadState.DOMCONTENTLOADED);
 
     return page;
   }
@@ -140,6 +145,9 @@ class UIResourceTests {
 
     assertThat(table)
       .isNotNull();
+
+    // Ensure the table is actually visible/rendered
+    table.waitFor(new WaitForOptions().setState(WaitForSelectorState.VISIBLE));
 
     var tableRowCount = table.getByRole(AriaRole.ROW).count();
     assertThat(tableRowCount)
