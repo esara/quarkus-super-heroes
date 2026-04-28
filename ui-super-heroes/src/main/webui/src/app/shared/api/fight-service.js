@@ -26,11 +26,12 @@ if (!basePath) {
  * Returns all the fights from the database
  *
  */
-export async function getFights() {
+export async function getFights({page = 0, size = 20} = {}) {
 
   const response = await axios.get(`${basePath}/api/fights`,
     {
       headers: defaultHeaders,
+      params: {page, size},
     }
   )
 
