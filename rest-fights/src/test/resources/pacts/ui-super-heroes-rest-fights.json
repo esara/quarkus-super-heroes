@@ -302,6 +302,62 @@
       "type": "Synchronous/HTTP"
     },
     {
+      "description": "A request for an empty page of fights (beyond available data or empty database)",
+      "key": "8f2a1c9e",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "No fights exist"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Accept": [
+            "application/json"
+          ]
+        },
+        "method": "GET",
+        "path": "/api/fights",
+        "query": {
+          "page": [
+            "10"
+          ],
+          "size": [
+            "100"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "content": [],
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "max": 0,
+                  "min": 0
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "transport": "https",
+      "type": "Synchronous/HTTP"
+    },
+    {
       "description": "A request for a random location",
       "key": "29587036",
       "pending": false,

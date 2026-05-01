@@ -1388,6 +1388,53 @@ class FightResourceIT {
 			);
 	}
 
+	@Test
+	@Order(DEFAULT_ORDER + 10)
+	void getFights_paginationBeyondAvailable_returnsEmptyListAndOk() {
+		given()
+			.queryParam("page", 10)
+			.queryParam("size", 100)
+			.when().get("/api/fights")
+			.then()
+				.statusCode(OK.getStatusCode())
+				.contentType(JSON)
+				.body("size()", is(0));
+	}
+
+	@Test
+	@Order(DEFAULT_ORDER + 10)
+	void getFights_firstPagedItemBelongsToFullListing() {
+		var allFights = get("/api/fights")
+			.then()
+				.statusCode(OK.getStatusCode())
+				.extract().body()
+				.jsonPath().getList(".", Fight.class);
+
+		assertThat(allFights).isNotEmpty();
+
+		var firstPage = given()
+			.queryParam("page", 0)
+			.queryParam("size", 1)
+			.when().get("/api/fights")
+			.then()
+				.statusCode(OK.getStatusCode())
+				.extract().body()
+				.jsonPath().getList(".", Fight.class);
+
+		assertThat(firstPage).hasSize(1);
+		assertThat(allFights).extracting(Fight::getId).contains(firstPage.get(0).getId());
+	}
+
+	@Test
+	@Order(DEFAULT_ORDER + 10)
+	void getFights_invalidPageQueryParameter_returnsNotFound() {
+		given()
+			.queryParam("page", "not-an-integer")
+			.when().get("/api/fights")
+			.then()
+				.statusCode(NOT_FOUND.getStatusCode());
+	}
+
 	private List<Fight> getAndVerifyAllFights() {
     var expectedFights = List.of(new Fight(), new Fight(), new Fight());
     expectedFights.get(0).winnerName = "Chewbacca";

@@ -254,14 +254,26 @@ describe("the fight service", () => {
       jest.resetAllMocks()
     })
 
-    it("invokes the remote api", async () => {
-      const response = await getFights(fightersData)
+    it("requests all fights without pagination query params by default", async () => {
+      await getFights()
       expect(axios.get).toHaveBeenCalled()
+      expect(axios.get.mock.calls[0][1].params).toBeUndefined()
     })
 
     it("returns the data", async () => {
-      const answer = await getFights(fightersData)
+      const answer = await getFights()
       expect(answer).toStrictEqual([fightData])
+    })
+
+    it("passes custom page and size as query params", async () => {
+      await getFights({page: 10, size: 100})
+      expect(axios.get.mock.calls[0][1].params).toEqual({page: 10, size: 100})
+    })
+
+    it("returns an empty list when the backend has no rows for the requested page", async () => {
+      axios.get.mockResolvedValue({data: [], headers: fightsList.headers})
+      const answer = await getFights({page: 10, size: 100})
+      expect(answer).toStrictEqual([])
     })
   })
 })

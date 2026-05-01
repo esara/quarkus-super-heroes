@@ -23,17 +23,22 @@ if (!basePath) {
 
 
 /**
- * Returns all the fights from the database
+ * Returns fights from the API. Call with no arguments to load every fight (matches backend when no query params).
+ * Pass `{ page, size }` to request a paginated slice (newest first).
  *
+ * @param [options] Optional `{ page, size }` for pagination
  */
-export async function getFights({page = 0, size = 20} = {}) {
-
-  const response = await axios.get(`${basePath}/api/fights`,
-    {
-      headers: defaultHeaders,
-      params: {page, size},
+export async function getFights(options = {}) {
+  const { page, size } = options
+  const config = { headers: defaultHeaders }
+  if (page !== undefined || size !== undefined) {
+    config.params = {
+      page: page ?? 0,
+      size: size ?? 20,
     }
-  )
+  }
+
+  const response = await axios.get(`${basePath}/api/fights`, config)
 
   return response.data
 }

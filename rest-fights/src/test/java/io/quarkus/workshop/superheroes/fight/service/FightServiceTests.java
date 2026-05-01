@@ -1,6 +1,7 @@
 package io.quarkus.workshop.superheroes.fight.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.time.Duration;
@@ -135,6 +136,43 @@ class FightServiceTests extends FightServiceTestsBase {
       .isEqualTo(createFightHeroWon());
 
 		verify(this.fightRepository).listAll();
+		verifyNoMoreInteractions(this.fightRepository);
+	}
+
+	@Test
+	void findFights_returnsPagedFight() {
+		when(this.fightRepository.listLatest(eq(0), eq(20)))
+			.thenReturn(Uni.createFrom().item(List.of(createFightHeroWon())));
+
+		var fights = this.fightService.findFights(0, 20)
+			.subscribe().withSubscriber(UniAssertSubscriber.create())
+			.assertSubscribed()
+			.awaitItem(Duration.ofSeconds(5))
+			.getItem();
+
+		assertThat(fights)
+			.singleElement()
+			.usingRecursiveComparison()
+			.isEqualTo(createFightHeroWon());
+
+		verify(this.fightRepository).listLatest(eq(0), eq(20));
+		verifyNoMoreInteractions(this.fightRepository);
+	}
+
+	@Test
+	void findFights_beyondLastPageReturnsEmpty() {
+		when(this.fightRepository.listLatest(eq(10), eq(100)))
+			.thenReturn(Uni.createFrom().item(List.of()));
+
+		var fights = this.fightService.findFights(10, 100)
+			.subscribe().withSubscriber(UniAssertSubscriber.create())
+			.assertSubscribed()
+			.awaitItem(Duration.ofSeconds(5))
+			.getItem();
+
+		assertThat(fights).isEmpty();
+
+		verify(this.fightRepository).listLatest(eq(10), eq(100));
 		verifyNoMoreInteractions(this.fightRepository);
 	}
 

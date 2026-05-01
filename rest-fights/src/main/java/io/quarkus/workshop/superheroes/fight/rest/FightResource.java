@@ -4,6 +4,7 @@ import static jakarta.ws.rs.core.MediaType.*;
 import static org.eclipse.microprofile.openapi.annotations.enums.SchemaType.ARRAY;
 
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -67,17 +68,17 @@ public class FightResource {
 	)
 	public Uni<List<Fight>> getFights(
     @Parameter(description = "Zero-based page index", example = "0")
-    @QueryParam("page") Integer page,
+    @QueryParam("page") Optional<Integer> page,
     @Parameter(description = "Page size (max 100)", example = "20")
-    @QueryParam("size") Integer size
+    @QueryParam("size") Optional<Integer> size
   ) {
-    if (page == null && size == null) {
+    if (page.isEmpty() && size.isEmpty()) {
       return this.service.findAllFights()
         .invoke(fights -> Log.debugf("Total number of fights: %d", fights.size()));
     }
 
-    int safePage = Math.max(0, page == null ? 0 : page);
-    int safeSize = Math.min(100, Math.max(1, size == null ? 20 : size));
+    int safePage = Math.max(0, page.orElse(0));
+    int safeSize = Math.min(100, Math.max(1, size.orElse(20)));
 
 		return this.service.findFights(safePage, safeSize)
 			.invoke(fights -> Log.debugf("Returned fights page=%d size=%d count=%d", safePage, safeSize, fights.size()));
