@@ -34,6 +34,16 @@ describe("the fight list", () => {
     // We don't care too much if it renders headings or shows blank, we just want there not to be an error
   })
 
+  it("renders no data rows when fights is an empty list", async () => {
+    await act(async () => {
+      render(<FightList fights={[]}/>)
+    })
+
+    const table = screen.getByRole("grid")
+    const tbody = within(table).getAllByRole("rowgroup")[1]
+    expect(within(tbody).queryAllByRole("row")).toHaveLength(0)
+  })
+
   it("renders a table with column headings", async () => {
     await act(async () => {
       render(<FightList fights={[fight]}/>)

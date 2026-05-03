@@ -1,6 +1,7 @@
 package io.quarkus.workshop.superheroes.fight;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -61,6 +62,8 @@ public class ContractVerificationTests {
     if (isNoFightsFoundState) {
       when(this.fightRepository.listAll())
         .thenReturn(Uni.createFrom().item(List.of()));
+      when(this.fightRepository.listLatest(anyInt(), anyInt()))
+        .thenReturn(Uni.createFrom().item(List.of()));
     } else {
       // For other states, return a fight with an ID set
       var fight = new Fight();
@@ -80,7 +83,10 @@ public class ContractVerificationTests {
       
       when(this.fightRepository.listAll())
         .thenReturn(Uni.createFrom().item(List.of(fight)));
-      
+
+      when(this.fightRepository.listLatest(anyInt(), anyInt()))
+        .thenReturn(Uni.createFrom().item(List.of(fight)));
+
       when(this.fightRepository.persist(any(Fight.class)))
         .thenAnswer(invocation -> {
           Fight f = invocation.getArgument(0);

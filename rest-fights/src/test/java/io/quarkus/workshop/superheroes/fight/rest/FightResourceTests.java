@@ -296,6 +296,126 @@ public class FightResourceTests {
 	}
 
 	@Test
+	void shouldGetFightsWithPagination_callsFindFightsWithResolvedDefaults() {
+		when(this.fightService.findFights(0, 20))
+			.thenReturn(Uni.createFrom().item(List.of()));
+
+		given()
+			.queryParam("page", 0)
+			.queryParam("size", 20)
+			.when().get("/api/fights")
+			.then()
+			.statusCode(OK.getStatusCode())
+			.body("size()", is(0));
+
+		verify(this.fightService).findFights(0, 20);
+		verifyNoMoreInteractions(this.fightService);
+	}
+
+	@Test
+	void shouldGetFightsWithPagination_onlyPage_usesDefaultSize() {
+		when(this.fightService.findFights(2, 20))
+			.thenReturn(Uni.createFrom().item(List.of()));
+
+		given()
+			.queryParam("page", 2)
+			.when().get("/api/fights")
+			.then()
+			.statusCode(OK.getStatusCode());
+
+		verify(this.fightService).findFights(2, 20);
+		verifyNoMoreInteractions(this.fightService);
+	}
+
+	@Test
+	void shouldGetFightsWithPagination_onlySize_usesDefaultPageZero() {
+		when(this.fightService.findFights(0, 5))
+			.thenReturn(Uni.createFrom().item(List.of()));
+
+		given()
+			.queryParam("size", 5)
+			.when().get("/api/fights")
+			.then()
+			.statusCode(OK.getStatusCode());
+
+		verify(this.fightService).findFights(0, 5);
+		verifyNoMoreInteractions(this.fightService);
+	}
+
+	@Test
+	void shouldGetFightsWithPagination_negativePage_clampedToZero() {
+		when(this.fightService.findFights(0, 20))
+			.thenReturn(Uni.createFrom().item(List.of()));
+
+		given()
+			.queryParam("page", -3)
+			.when().get("/api/fights")
+			.then()
+			.statusCode(OK.getStatusCode());
+
+		verify(this.fightService).findFights(0, 20);
+		verifyNoMoreInteractions(this.fightService);
+	}
+
+	@Test
+	void shouldGetFightsWithPagination_sizeAboveMax_clampedTo100() {
+		when(this.fightService.findFights(0, 100))
+			.thenReturn(Uni.createFrom().item(List.of()));
+
+		given()
+			.queryParam("size", 500)
+			.when().get("/api/fights")
+			.then()
+			.statusCode(OK.getStatusCode());
+
+		verify(this.fightService).findFights(0, 100);
+		verifyNoMoreInteractions(this.fightService);
+	}
+
+	@Test
+	void shouldGetFightsWithPagination_sizeBelowMin_clampedTo1() {
+		when(this.fightService.findFights(0, 1))
+			.thenReturn(Uni.createFrom().item(List.of()));
+
+		given()
+			.queryParam("size", 0)
+			.when().get("/api/fights")
+			.then()
+			.statusCode(OK.getStatusCode());
+
+		verify(this.fightService).findFights(0, 1);
+		verifyNoMoreInteractions(this.fightService);
+	}
+
+	@Test
+	void shouldGetFightsWithPagination_beyondLastPage_returnsEmptyList() {
+		when(this.fightService.findFights(10, 100))
+			.thenReturn(Uni.createFrom().item(List.of()));
+
+		given()
+			.queryParam("page", 10)
+			.queryParam("size", 100)
+			.when().get("/api/fights")
+			.then()
+			.statusCode(OK.getStatusCode())
+			.body("size()", is(0));
+
+		verify(this.fightService).findFights(10, 100);
+		verifyNoMoreInteractions(this.fightService);
+	}
+
+	@Test
+	void shouldRejectNonNumericPageQueryParam() {
+		given()
+			.queryParam("page", "not-a-number")
+			.when().get("/api/fights")
+			.then()
+				.statusCode(BAD_REQUEST.getStatusCode());
+
+		verifyNoInteractions(this.fightService);
+	}
+
+	@Test
 	public void shouldGetNoFightFound() {
 		when(this.fightService.findFightById(DEFAULT_FIGHT_ID))
 			.thenReturn(Uni.createFrom().nullItem());

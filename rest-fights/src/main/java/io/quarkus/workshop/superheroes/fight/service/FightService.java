@@ -90,6 +90,12 @@ public class FightService {
 		return this.fightRepository.listAll();
 	}
 
+  @WithSpan("FightService.findFights")
+  public Uni<List<Fight>> findFights(int page, int size) {
+    Log.debugf("Getting fights page=%d size=%d", page, size);
+    return this.fightRepository.listLatest(page, size);
+  }
+
   @WithSpan("FightService.findFightById")
 	public Uni<Fight> findFightById(@SpanAttribute("arg.id") Long id) {
     Log.debugf("Finding fight by id = %d", id);
