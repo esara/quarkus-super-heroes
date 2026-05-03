@@ -410,7 +410,7 @@ public class FightResourceTests {
 			.queryParam("page", "not-a-number")
 			.when().get("/api/fights")
 			.then()
-				.statusCode(NOT_FOUND.getStatusCode());
+				.statusCode(BAD_REQUEST.getStatusCode());
 
 		verifyNoInteractions(this.fightService);
 	}

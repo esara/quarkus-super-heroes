@@ -1389,7 +1389,7 @@ class FightResourceIT {
 	}
 
 	@Test
-	@Order(DEFAULT_ORDER + 10)
+	@Order(DEFAULT_ORDER)
 	void getFights_paginationBeyondAvailable_returnsEmptyListAndOk() {
 		given()
 			.queryParam("page", 10)
@@ -1402,7 +1402,7 @@ class FightResourceIT {
 	}
 
 	@Test
-	@Order(DEFAULT_ORDER + 10)
+	@Order(DEFAULT_ORDER)
 	void getFights_firstPagedItemBelongsToFullListing() {
 		var allFights = get("/api/fights")
 			.then()
@@ -1426,13 +1426,13 @@ class FightResourceIT {
 	}
 
 	@Test
-	@Order(DEFAULT_ORDER + 10)
-	void getFights_invalidPageQueryParameter_returnsNotFound() {
+	@Order(DEFAULT_ORDER)
+	void getFights_invalidPageQueryParameter_returnsBadRequest() {
 		given()
 			.queryParam("page", "not-an-integer")
 			.when().get("/api/fights")
 			.then()
-				.statusCode(NOT_FOUND.getStatusCode());
+				.statusCode(BAD_REQUEST.getStatusCode());
 	}
 
 	private List<Fight> getAndVerifyAllFights() {

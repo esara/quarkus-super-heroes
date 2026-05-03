@@ -16,6 +16,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -66,22 +67,38 @@ public class FightResource {
       examples = @ExampleObject(name = "fights", value = Examples.VALID_EXAMPLE_FIGHT_LIST)
     )
 	)
+	@APIResponse(responseCode = "400", description = "Invalid page or size query parameter (not an integer)")
 	public Uni<List<Fight>> getFights(
     @Parameter(description = "Zero-based page index", example = "0")
-    @QueryParam("page") Optional<Integer> page,
+    @QueryParam("page") Optional<String> page,
     @Parameter(description = "Page size (max 100)", example = "20")
-    @QueryParam("size") Optional<Integer> size
+    @QueryParam("size") Optional<String> size
   ) {
     if (page.isEmpty() && size.isEmpty()) {
       return this.service.findAllFights()
         .invoke(fights -> Log.debugf("Total number of fights: %d", fights.size()));
     }
 
-    int safePage = Math.max(0, page.orElse(0));
-    int safeSize = Math.min(100, Math.max(1, size.orElse(20)));
+    int safePage = Math.max(0, parsePaginationInt(page, 0));
+    int safeSize = Math.min(100, Math.max(1, parsePaginationInt(size, 20)));
 
 		return this.service.findFights(safePage, safeSize)
 			.invoke(fights -> Log.debugf("Returned fights page=%d size=%d count=%d", safePage, safeSize, fights.size()));
+	}
+
+	private static int parsePaginationInt(Optional<String> raw, int defaultValue) {
+		if (raw.isEmpty()) {
+			return defaultValue;
+		}
+		String s = raw.get().trim();
+		if (s.isEmpty()) {
+			return defaultValue;
+		}
+		try {
+			return Integer.parseInt(s);
+		} catch (NumberFormatException e) {
+			throw new WebApplicationException(Response.status(Status.BAD_REQUEST).build());
+		}
 	}
 
 	@GET

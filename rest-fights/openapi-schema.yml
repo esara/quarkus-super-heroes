@@ -23,6 +23,8 @@ paths:
         Defaults are page 0 and size 20; `page` is clamped to at least 0, `size` to between 1 and 100.
 
         A page beyond available data returns HTTP 200 with an empty array.
+
+        Non-integer `page` or `size` values return HTTP 400.
       parameters:
       - name: page
         in: query
@@ -70,6 +72,8 @@ paths:
                       description: "An American city rife with corruption and crime,\
                         \ the home of its iconic protector Batman."
                       picture: https://raw.githubusercontent.com/esara/quarkus-super-heroes/characterdata/images/locations/gotham_city.jpg
+        "400":
+          description: Invalid `page` or `size` query parameter (not a valid integer)
     post:
       tags:
       - fights
