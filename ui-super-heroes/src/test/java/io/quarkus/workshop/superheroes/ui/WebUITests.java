@@ -7,6 +7,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.atIndex;
 import static org.hamcrest.Matchers.matchesPattern;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -24,6 +27,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Page.GetByRoleOptions;
 import com.microsoft.playwright.Response;
+import com.microsoft.playwright.Route;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
@@ -44,6 +48,40 @@ import io.restassured.RestAssured;
 class WebUITests {
 	private static final String IMAGE_LOCATION_TEMPLATE = "https://raw.githubusercontent.com/esara/quarkus-super-heroes/characterdata/images/%s";
 
+	/**
+	 * Paginated {@code GET .../api/fights?page=...} is not reliably mocked by Microcks for this UI test;
+	 * stub the list response so the fight table is populated like the OpenAPI example.
+	 */
+	private static final Pattern GET_FIGHTS_LIST_URL = Pattern.compile("^.*/api/fights(\\?.*)?$");
+
+	private static final String FIGHTS_LIST_PAGE_FIXTURE = readFightsListFixture();
+
+	private static String readFightsListFixture() {
+		try (var in = WebUITests.class.getResourceAsStream("/mock-fights-list-page.json")) {
+			if (in == null) {
+				throw new IllegalStateException("classpath resource /mock-fights-list-page.json not found");
+			}
+			return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private static void installFightListRouteStub(Page page) {
+		page.route(
+			GET_FIGHTS_LIST_URL,
+			route -> {
+				if (!HttpMethod.GET.equals(route.request().method())) {
+					route.resume();
+					return;
+				}
+				route.fulfill(new Route.FulfillOptions()
+					.setStatus(200)
+					.setContentType("application/json")
+					.setBody(FIGHTS_LIST_PAGE_FIXTURE));
+			});
+	}
+
 	@InjectPlaywright
 	BrowserContext context;
 
@@ -55,7 +93,7 @@ class WebUITests {
       .body(matchesPattern(Pattern.compile(".*<div id=\"root\">.*", Pattern.DOTALL)));
 	}
 
-// 	@Test
+	@Test
 	void pageWorks() {
 		var page = loadPage();
 
@@ -81,6 +119,7 @@ class WebUITests {
 
 	private Page loadPage() {
 		var page = this.context.newPage();
+		installFightListRouteStub(page);
 		var response = page.navigate("%s:%d".formatted(RestAssured.baseURI, RestAssured.port));
 
 		assertThat(response).isNotNull()
@@ -96,7 +135,7 @@ class WebUITests {
 	}
 
 	private Locator getTable(Page page) {
-		var table = page.getByRole(AriaRole.GRID);
+		var table = page.getByRole(AriaRole.GRID, new GetByRoleOptions().setName("fights-table"));
 
 		assertThat(table)
       .isNotNull();
@@ -111,9 +150,10 @@ class WebUITests {
 
 	private Locator getTableAndVerifyTable(Page page) {
 		var table = getTable(page);
+		var dataRows = table.getByRole(AriaRole.ROW);
 
-		assertThat(table.getByRole(AriaRole.ROW).count())
-      .isEqualTo(1);
+		PlaywrightAssertions.assertThat(dataRows)
+			.hasCount(1);
 
 		return table;
 	}
