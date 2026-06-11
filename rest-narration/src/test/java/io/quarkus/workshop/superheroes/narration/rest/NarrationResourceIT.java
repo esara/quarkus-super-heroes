@@ -54,6 +54,11 @@ abstract class NarrationResourceIT {
       "azure-openai".equals(System.getProperty("quarkus.test.integration-test-profile"));
   }
 
+  static boolean anthropicEnabled() {
+    return "anthropic".equals(System.getenv("QUARKUS_TEST_INTEGRATION_TEST_PROFILE")) ||
+      "anthropic".equals(System.getProperty("quarkus.test.integration-test-profile"));
+  }
+
   @Test
   void shouldPingOpenAPI() {
     given()

@@ -22,6 +22,7 @@ import io.quarkiverse.wiremock.devservice.WireMockConfigKey;
 @QuarkusIntegrationTest
 @TestProfile(WiremockOpenAITestProfile.class)
 @DisabledIf(value = "azureOpenAiEnabled", disabledReason = "Azure OpenAI profile is enabled")
+@DisabledIf(value = "anthropicEnabled", disabledReason = "Anthropic profile is enabled")
 class OpenAiNarrationResourceIT extends NarrationResourceIT {
 	private static final String NARRATION_REQUEST_JSON = """
     {
