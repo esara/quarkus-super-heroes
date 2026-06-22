@@ -27,6 +27,8 @@ import io.quarkus.test.junit.mockito.InjectSpy;
 import io.quarkus.workshop.superheroes.fight.Fight;
 import io.quarkus.workshop.superheroes.fight.FightImage;
 import io.quarkus.workshop.superheroes.fight.Fighters;
+import io.quarkus.workshop.superheroes.fight.ImageGenerationRequest;
+import io.quarkus.workshop.superheroes.fight.client.NarrationImageGenerationRequest;
 import io.quarkus.workshop.superheroes.fight.client.Hero;
 import io.quarkus.workshop.superheroes.fight.client.HeroClient;
 import io.quarkus.workshop.superheroes.fight.client.LocationClient;
@@ -263,7 +265,13 @@ public class FightServiceConsumerContractTests extends FightServiceTestsBase {
     var imageGenBody = newJsonBody(body ->
       body
         .stringType("imageUrl", DEFAULT_NARRATION_IMAGE_URL)
-        .stringType("imageNarration", DEFAULT_NARRATION_IMAGE_NARRATION)
+    ).build();
+
+    var requestBody = newJsonBody(body ->
+      body
+        .stringType("narration", DEFAULT_NARRATION)
+        .stringType("winnerPictureUrl", DEFAULT_HERO_PICTURE)
+        .stringType("loserPictureUrl", DEFAULT_VILLAIN_PICTURE)
     ).build();
 
     return builder
@@ -272,9 +280,9 @@ public class FightServiceConsumerContractTests extends FightServiceTestsBase {
         .method(HttpMethod.POST)
         .headers(
           HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON,
-          HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN
+          HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON
         )
-        .body(PactDslRootValue.stringMatcher("[.\\s\\S]+", DEFAULT_NARRATION))
+        .body(requestBody)
       .willRespondWith()
         .headers(Map.of(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
         .status(Status.OK.getStatusCode())
@@ -529,7 +537,9 @@ public class FightServiceConsumerContractTests extends FightServiceTestsBase {
   void generateImageFromNarrationSuccess() {
     PanacheMock.mock(Fight.class);
 
-    var fightImage = this.fightService.generateImageFromNarration(DEFAULT_NARRATION)
+    var request = new ImageGenerationRequest(DEFAULT_NARRATION, DEFAULT_HERO_PICTURE, DEFAULT_VILLAIN_PICTURE);
+
+    var fightImage = this.fightService.generateImageFromNarration(request)
       .subscribe().withSubscriber(UniAssertSubscriber.create())
       .assertSubscribed()
       .awaitItem(Duration.ofSeconds(5))
@@ -538,10 +548,10 @@ public class FightServiceConsumerContractTests extends FightServiceTestsBase {
     assertThat(fightImage)
       .isNotNull()
       .usingRecursiveAssertion()
-      .isEqualTo(new FightImage(DEFAULT_NARRATION_IMAGE_URL, DEFAULT_NARRATION_IMAGE_NARRATION));
+      .isEqualTo(new FightImage(DEFAULT_NARRATION_IMAGE_URL));
 
-    verify(this.narrationClient).generateImageFromNarration(DEFAULT_NARRATION);
-    verify(this.fightService, never()).fallbackGenerateImageFromNarration(DEFAULT_NARRATION);
+    verify(this.narrationClient).generateImageFromNarration(any(NarrationImageGenerationRequest.class));
+    verify(this.fightService, never()).fallbackGenerateImageFromNarration(request);
     verifyNoInteractions(this.heroClient, this.villainClient, this.locationClient);
 		PanacheMock.verifyNoInteractions(Fight.class);
   }

@@ -34,6 +34,7 @@ import io.quarkus.logging.Log;
 
 import io.quarkus.workshop.superheroes.fight.Fight;
 import io.quarkus.workshop.superheroes.fight.FightImage;
+import io.quarkus.workshop.superheroes.fight.ImageGenerationRequest;
 import io.quarkus.workshop.superheroes.fight.FightLocation;
 import io.quarkus.workshop.superheroes.fight.FightRequest;
 import io.quarkus.workshop.superheroes.fight.Fighters;
@@ -228,7 +229,7 @@ public class FightResource {
   @POST
   @Path("/narrate/image")
   @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.TEXT_PLAIN)
+  @Consumes(MediaType.APPLICATION_JSON)
   @Operation(summary = "Generate an image from a narration")
   @APIResponse(
     responseCode = "200",
@@ -240,20 +241,20 @@ public class FightResource {
   )
   @APIResponse(
     responseCode = "400",
-    description = "Invalid (or missing) narration"
+    description = "Invalid (or missing) request"
   )
   public Uni<FightImage> generateImageFromNarration(
     @RequestBody(
-      name = "narration",
+      name = "request",
       required = true,
       content = @Content(
-        schema = @Schema(implementation = String.class),
-        examples = @ExampleObject(name = "narration", value = "This is your fight narration!")
+        schema = @Schema(implementation = ImageGenerationRequest.class),
+        examples = @ExampleObject(name = "request", value = Examples.EXAMPLE_IMAGE_GENERATION_REQUEST)
       )
     )
-    @NotBlank String narration) {
-    return this.service.generateImageFromNarration(narration)
-      .invoke(image -> Log.debugf("Image (%s) generated from narration: %s", image, narration));
+    @NotNull @Valid ImageGenerationRequest request) {
+    return this.service.generateImageFromNarration(request)
+      .invoke(image -> Log.debugf("Image (%s) generated from request: %s", image, request));
   }
 
 	@GET

@@ -18,6 +18,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.workshop.superheroes.narration.Fight;
 import io.quarkus.workshop.superheroes.narration.Fight.FightLocation;
 import io.quarkus.workshop.superheroes.narration.FightImage;
+import io.quarkus.workshop.superheroes.narration.ImageGenerationRequest;
 import io.quarkus.workshop.superheroes.narration.service.ImageGenerationService;
 import io.quarkus.workshop.superheroes.narration.service.NarrationService;
 
@@ -48,7 +49,6 @@ class NarrationResourceTest {
     new FightLocation(DEFAULT_LOCATION_NAME, DEFAULT_LOCATION_DESCRIPTION)
   );
   private static final String DEFAULT_IMAGE_URL = "https://somewhere.com/someImage.png";
-  private static final String DEFAULT_IMAGE_NARRATION = "Alternate image narration";
 
   @InjectMock
   NarrationService narrationService;
@@ -106,14 +106,15 @@ class NarrationResourceTest {
 
   @Test
   void shouldGenerateAnImageFromNarration() {
-    var image = new FightImage(DEFAULT_IMAGE_URL, DEFAULT_IMAGE_NARRATION);
+    var request = new ImageGenerationRequest(NARRATION, "https://winner.png", "https://loser.png");
+    var image = new FightImage(DEFAULT_IMAGE_URL);
 
-    when(this.imageGenerationService.generateImageForNarration(NARRATION))
+    when(this.imageGenerationService.generateImageForNarration(request))
       .thenReturn(image);
 
     var generatedImage = given()
-      .body(NARRATION)
-      .contentType(TEXT)
+      .body(request)
+      .contentType(JSON)
       .accept(JSON)
       .when().post("/api/narration/image").then()
         .statusCode(OK.getStatusCode())
@@ -125,7 +126,7 @@ class NarrationResourceTest {
       .usingRecursiveAssertion()
       .isEqualTo(image);
 
-    verify(this.imageGenerationService).generateImageForNarration(NARRATION);
+    verify(this.imageGenerationService).generateImageForNarration(request);
     verifyNoMoreInteractions(this.imageGenerationService);
     verifyNoInteractions(this.narrationService);
   }
@@ -144,7 +145,7 @@ class NarrationResourceTest {
   @Test
   void invalidNarrationToFetchImage() {
     given()
-      .contentType(TEXT)
+      .contentType(JSON)
       .accept(JSON)
       .when().post("/api/narration/image").then()
       .statusCode(BAD_REQUEST.getStatusCode());
