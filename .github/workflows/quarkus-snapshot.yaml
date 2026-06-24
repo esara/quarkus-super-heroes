@@ -23,12 +23,12 @@ jobs:
           distribution: temurin
           
       - name: Checkout repo
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           path: current-repo
 
       - name: Checkout Ecosystem
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           repository: ${{ env.ECOSYSTEM_CI_REPO }}
           path: ecosystem-ci
