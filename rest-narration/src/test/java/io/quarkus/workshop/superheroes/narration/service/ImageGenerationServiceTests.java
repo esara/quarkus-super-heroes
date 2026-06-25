@@ -11,20 +11,18 @@ import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 
 import io.quarkus.workshop.superheroes.narration.FightImage;
+import io.quarkus.workshop.superheroes.narration.ImageGenerationRequest;
 
 import dev.langchain4j.data.image.Image;
 import dev.langchain4j.model.image.ImageModel;
 import dev.langchain4j.model.output.Response;
-import io.quarkiverse.langchain4j.ModelName;
 
 @QuarkusTest
 class ImageGenerationServiceTests {
-  private static final String DEFAULT_IMAGE_URL = "https://somewhere.com/someImage.png";
-  private static final String DEFAULT_IMAGE_NARRATION = "Alternate image narration";
   private static final String NARRATION = "Lorem ipsum dolor sit amet";
+  private static final String PROMPT = ImageGenerationService.SYSTEM_MESSAGE + "\nHere is the fight narration: \"" + NARRATION + "\"";
 
   @InjectMock
-  @ModelName("dalle3")
   ImageModel imageModel;
 
   @Inject
@@ -33,25 +31,20 @@ class ImageGenerationServiceTests {
   @Test
   void generateImageForNarration() {
     var image = Image.builder()
-      .url(DEFAULT_IMAGE_URL)
-      .revisedPrompt(DEFAULT_IMAGE_NARRATION)
+      .revisedPrompt("Alternate image narration")
+      .base64Data("base64Data")
+      .mimeType("image/png")
       .build();
 
-    when(this.imageModel.generate(startsWith(NARRATION)))
-      .thenReturn(new Response<>(image));
+    when(this.imageModel.generate(startsWith(PROMPT)))
+      .thenReturn(Response.from(image));
 
-    assertThat(this.imageGenerationService.generateImageForNarration(NARRATION))
+    assertThat(this.imageGenerationService.generateImageForNarration(new ImageGenerationRequest(NARRATION, "http://somewhere.com", "http://somewhereelse.com")))
       .isNotNull()
-      .extracting(
-        FightImage::imageNarration,
-        FightImage::imageUrl
-      )
-      .containsExactly(
-        image.revisedPrompt(),
-        image.url().toString()
-      );
+      .extracting(FightImage::imageUrl)
+      .isEqualTo("data:image/png;base64,base64Data");
 
-    verify(this.imageModel).generate(startsWith(NARRATION));
+    verify(this.imageModel).generate(startsWith(PROMPT));
     verifyNoMoreInteractions(this.imageModel);
   }
 }

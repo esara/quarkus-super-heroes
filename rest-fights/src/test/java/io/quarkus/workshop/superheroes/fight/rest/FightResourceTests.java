@@ -21,6 +21,7 @@ import io.quarkus.test.junit.QuarkusTest;
 
 import io.quarkus.workshop.superheroes.fight.Fight;
 import io.quarkus.workshop.superheroes.fight.FightImage;
+import io.quarkus.workshop.superheroes.fight.ImageGenerationRequest;
 import io.quarkus.workshop.superheroes.fight.FightLocation;
 import io.quarkus.workshop.superheroes.fight.FightRequest;
 import io.quarkus.workshop.superheroes.fight.Fighters;
@@ -67,7 +68,6 @@ public class FightResourceTests {
   private static final String DEFAULT_LOCATION_PICTURE = "gotham_city.png";
 
   private static final String DEFAULT_IMAGE_URL = "https://somewhere.com/someImage.png";
-  private static final String DEFAULT_IMAGE_NARRATION = "Alternate image narration";
 
 	@InjectMock
 	FightService fightService;
@@ -186,14 +186,15 @@ public class FightResourceTests {
 
   @Test
   void shouldGenerateAnImageFromNarration() {
-    var image = new FightImage(DEFAULT_IMAGE_URL, DEFAULT_IMAGE_NARRATION);
+    var image = new FightImage(DEFAULT_IMAGE_URL);
+    var request = new ImageGenerationRequest(DEFAULT_NARRATION, null, null);
 
-    when(this.fightService.generateImageFromNarration(DEFAULT_NARRATION))
+    when(this.fightService.generateImageFromNarration(request))
       .thenReturn(Uni.createFrom().item(image));
 
     var generatedImage = given()
-      .body(DEFAULT_NARRATION)
-      .contentType(TEXT)
+      .body(request)
+      .contentType(JSON)
       .accept(JSON)
       .when().post("/api/fights/narrate/image").then()
         .statusCode(OK.getStatusCode())
@@ -205,14 +206,14 @@ public class FightResourceTests {
       .usingRecursiveAssertion()
       .isEqualTo(image);
 
-    verify(this.fightService).generateImageFromNarration(DEFAULT_NARRATION);
+    verify(this.fightService).generateImageFromNarration(request);
     verifyNoMoreInteractions(this.fightService);
   }
 
   @Test
   void shouldNotGetGeneratedImageForNarrationBecauseInvalidNarration() {
     given()
-      .contentType(TEXT)
+      .contentType(JSON)
       .accept(JSON)
       .when().post("/api/fights/narrate/image").then()
       .statusCode(BAD_REQUEST.getStatusCode());
@@ -417,7 +418,7 @@ public class FightResourceTests {
 
 	@Test
 	public void shouldGetNoFightFound() {
-		when(this.fightService.findFightById(DEFAULT_FIGHT_ID))
+		when(this.fightService.findFightById(eq(DEFAULT_FIGHT_ID)))
 			.thenReturn(Uni.createFrom().nullItem());
 
 		get("/api/fights/{id}", DEFAULT_FIGHT_ID)

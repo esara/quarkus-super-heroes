@@ -24,6 +24,7 @@ import io.quarkus.workshop.superheroes.fight.FightImage;
 import io.quarkus.workshop.superheroes.fight.FightLocation;
 import io.quarkus.workshop.superheroes.fight.FightRequest;
 import io.quarkus.workshop.superheroes.fight.Fighters;
+import io.quarkus.workshop.superheroes.fight.ImageGenerationRequest;
 import io.quarkus.workshop.superheroes.fight.client.FightToNarrate;
 import io.quarkus.workshop.superheroes.fight.client.Hero;
 import io.quarkus.workshop.superheroes.fight.client.HeroClient;
@@ -33,6 +34,7 @@ import io.quarkus.workshop.superheroes.fight.client.Villain;
 import io.quarkus.workshop.superheroes.fight.client.VillainClient;
 import io.quarkus.workshop.superheroes.fight.config.FightConfig;
 import io.quarkus.workshop.superheroes.fight.mapping.FightMapper;
+import io.quarkus.workshop.superheroes.fight.mapping.ImageGenerationRequestMapper;
 import io.quarkus.workshop.superheroes.fight.repository.FightRepository;
 
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
@@ -55,10 +57,11 @@ public class FightService {
 	private final MutinyEmitter<io.quarkus.workshop.superheroes.fight.schema.Fight> emitter;
 	private final FightConfig fightConfig;
   private final FightMapper fightMapper;
+  private final ImageGenerationRequestMapper imageGenerationRequestMapper;
 	private final FightRepository fightRepository;
 	private final Random random = new Random();
 
-	public FightService(HeroClient heroClient, VillainClient villainClient, @RestClient NarrationClient narrationClient, LocationClient locationClient, @Channel("fights") MutinyEmitter<io.quarkus.workshop.superheroes.fight.schema.Fight> emitter, FightConfig fightConfig, FightMapper fightMapper, FightRepository fightRepository) {
+	public FightService(HeroClient heroClient, VillainClient villainClient, @RestClient NarrationClient narrationClient, LocationClient locationClient, @Channel("fights") MutinyEmitter<io.quarkus.workshop.superheroes.fight.schema.Fight> emitter, FightConfig fightConfig, FightMapper fightMapper, ImageGenerationRequestMapper imageGenerationRequestMapper, FightRepository fightRepository) {
 		this.heroClient = heroClient;
 		this.villainClient = villainClient;
     this.narrationClient = narrationClient;
@@ -66,6 +69,7 @@ public class FightService {
 		this.emitter = emitter;
 		this.fightConfig = fightConfig;
     this.fightMapper = fightMapper;
+    this.imageGenerationRequestMapper = imageGenerationRequestMapper;
 		this.fightRepository = fightRepository;
   }
 
@@ -245,10 +249,10 @@ public class FightService {
       .invoke(n -> Log.warn("Falling back on Narration"));
   }
 
-  Uni<FightImage> fallbackGenerateImageFromNarration(String narration) {
+  Uni<FightImage> fallbackGenerateImageFromNarration(ImageGenerationRequest request) {
     var fallbackImageGeneration = this.fightConfig.narration().fallbackImageGeneration();
 
-    return Uni.createFrom().item(new FightImage(fallbackImageGeneration.imageUrl(), fallbackImageGeneration.imageNarration()))
+    return Uni.createFrom().item(new FightImage(fallbackImageGeneration.imageUrl()))
       .invoke(i -> Log.warn("Falling back on narration image generation"));
   }
 
@@ -285,9 +289,9 @@ public class FightService {
   @Retry(maxRetries = 3, delay = 200, delayUnit = ChronoUnit.MILLIS)
 	@Fallback(fallbackMethod = "fallbackGenerateImageFromNarration")
   @WithSpan("FightService.generateImageFromNarration")
-  public Uni<FightImage> generateImageFromNarration(@SpanAttribute("arg.narration") String narration) {
-    Log.debugf("Generating image for narration: %s", narration);
-    return this.narrationClient.generateImageFromNarration(narration);
+  public Uni<FightImage> generateImageFromNarration(@SpanAttribute("arg.request") ImageGenerationRequest request) {
+    Log.debugf("Generating image for request: %s", request);
+    return this.narrationClient.generateImageFromNarration(this.imageGenerationRequestMapper.toClientRequest(request));
   }
 
   @WithSpan("FightService.persistFight")

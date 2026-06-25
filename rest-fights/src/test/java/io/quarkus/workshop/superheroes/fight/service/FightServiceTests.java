@@ -28,6 +28,8 @@ import io.quarkus.workshop.superheroes.fight.Fight;
 import io.quarkus.workshop.superheroes.fight.FightImage;
 import io.quarkus.workshop.superheroes.fight.FightRequest;
 import io.quarkus.workshop.superheroes.fight.Fighters;
+import io.quarkus.workshop.superheroes.fight.ImageGenerationRequest;
+import io.quarkus.workshop.superheroes.fight.client.NarrationImageGenerationRequest;
 import io.quarkus.workshop.superheroes.fight.ShorterTimeoutsProfile;
 import io.quarkus.workshop.superheroes.fight.client.FightToNarrate;
 import io.quarkus.workshop.superheroes.fight.client.Hero;
@@ -64,7 +66,7 @@ class FightServiceTests extends FightServiceTestsBase {
                                                    The people knew that their protector had once again ensured their safety.
                                                    """;
 
-  private static final FightImage IMAGE = new FightImage("https://somewhere.com/someImage.png", "Fallback image");
+  private static final FightImage IMAGE = new FightImage("https://somewhere.com/someImage.png");
 
   @InjectMock
   HeroClient heroClient;
@@ -512,14 +514,15 @@ class FightServiceTests extends FightServiceTestsBase {
   @Test
   void generateFightImageFromNarrationTimesOut() {
     var timeout = Duration.ofSeconds(ShorterTimeoutsProfile.NARRATION_OVERRIDDEN_TIMEOUT + 1);
+    var request = new ImageGenerationRequest(DEFAULT_NARRATION, null, null);
 
-    when(this.narrationClient.generateImageFromNarration(DEFAULT_NARRATION))
+    when(this.narrationClient.generateImageFromNarration(any(NarrationImageGenerationRequest.class)))
       .thenReturn(
         Uni.createFrom().item(IMAGE)
           .onItem().delayIt().by(timeout)
       );
 
-    var image = this.fightService.generateImageFromNarration(DEFAULT_NARRATION)
+    var image = this.fightService.generateImageFromNarration(request)
 			.subscribe().withSubscriber(UniAssertSubscriber.create())
 			.assertSubscribed()
 			.awaitItem(timeout.multipliedBy(4))
@@ -530,17 +533,19 @@ class FightServiceTests extends FightServiceTestsBase {
       .usingRecursiveAssertion()
       .isEqualTo(getFallbackImage());
 
-    verify(this.fightService).generateImageFromNarration(DEFAULT_NARRATION);
-    verify(this.fightService).fallbackGenerateImageFromNarration(DEFAULT_NARRATION);
+    verify(this.fightService).generateImageFromNarration(request);
+    verify(this.fightService).fallbackGenerateImageFromNarration(request);
   }
 
   @Test
   void generateFightFromNarrationError() {
+    var request = new ImageGenerationRequest(DEFAULT_NARRATION, null, null);
+
     doThrow(new RuntimeException())
       .when(this.narrationClient)
-      .generateImageFromNarration(DEFAULT_NARRATION);
+      .generateImageFromNarration(any(NarrationImageGenerationRequest.class));
 
-    var image = this.fightService.generateImageFromNarration(DEFAULT_NARRATION)
+    var image = this.fightService.generateImageFromNarration(request)
 			.subscribe().withSubscriber(UniAssertSubscriber.create())
 			.assertSubscribed()
 			.awaitItem(Duration.ofSeconds(ShorterTimeoutsProfile.NARRATION_OVERRIDDEN_TIMEOUT + 1).multipliedBy(4))
@@ -551,8 +556,8 @@ class FightServiceTests extends FightServiceTestsBase {
       .usingRecursiveAssertion()
       .isEqualTo(getFallbackImage());
 
-    verify(this.fightService).generateImageFromNarration(DEFAULT_NARRATION);
-    verify(this.fightService).fallbackGenerateImageFromNarration(DEFAULT_NARRATION);
+    verify(this.fightService).generateImageFromNarration(request);
+    verify(this.fightService).fallbackGenerateImageFromNarration(request);
   }
 
   @Test
@@ -1017,7 +1022,7 @@ class FightServiceTests extends FightServiceTestsBase {
 
   private FightImage getFallbackImage() {
     var image = this.fightConfig.narration().fallbackImageGeneration();
-    return new FightImage(image.imageUrl(), image.imageNarration());
+    return new FightImage(image.imageUrl());
   }
 
   private static Fight createFightHeroWon() {
