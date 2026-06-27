@@ -38,9 +38,9 @@ spec:
         app.kubernetes.io/managed-by: quarkus
     spec:
       containers:
-        - image: "esara/quarkus-workshop-grpc-locations"
-          imagePullPolicy: "IfNotPresent"
-          name: "quarkus-workshop-grpc-locations"
+        - image: esara/quarkus-workshop-grpc-locations
+          imagePullPolicy: IfNotPresent
+          name: quarkus-workshop-grpc-locations
           ports:
             - containerPort: 8080
               name: http

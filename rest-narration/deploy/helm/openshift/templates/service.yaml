@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.openshift.io/vcs-uri: <<unknown>>
+    app.quarkus.io/vcs-ref: main
+    app.openshift.io/vcs-ref: main
+    app.openshift.io/connects-to: otel-collector
+    app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+    app.openshift.io/vcs-url: https://github.com/esara/quarkus-super-heroes
+    app.quarkus.io/quarkus-version: 3.36.3
+    app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+    app.quarkus.io/build-timestamp: 2026-06-26 - 02:07:00 +0000
+  labels:
+    app.kubernetes.io/name: rest-narration
+    app.kubernetes.io/part-of: narration-service
+    app.kubernetes.io/version: java25-latest
+    app: rest-narration
+    application: narration-service
+    system: quarkus-super-heroes
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: rest-narration
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: {{ .Values.app.ports.http }}
+  selector:
+    app.kubernetes.io/name: rest-narration
+    app.kubernetes.io/part-of: narration-service
+    app.kubernetes.io/version: java25-latest
+  type: ClusterIP

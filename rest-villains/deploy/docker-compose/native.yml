@@ -3,11 +3,10 @@
 # ANY LOCAL CHANGES YOU MAKE SHOULD NOT BE COMMITTED TO SOURCE CONTROL.
 #######################################################################
 
-version: "3"
 services:
 
   villains-db:
-    image: postgres:16
+    image: postgres:18
     container_name: villains-db
     ports:
       - "5432"
@@ -19,7 +18,7 @@ services:
       - ../../../rest-villains/deploy/db-init/initialize-tables.sql:/docker-entrypoint-initdb.d/1-init-tables.sql
 
   rest-villains-native:
-    image: quay.io/quarkus-super-heroes/rest-villains:native-latest
+    image: esara/rest-villains:native-latest
     container_name: rest-villains-native
     depends_on:
       - villains-db

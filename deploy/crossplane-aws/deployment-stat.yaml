@@ -27,6 +27,7 @@ spec:
         app.quarkus.io/vcs-ref: main
         app.quarkus.io/vcs-url: https://github.com/esara/quarkus-super-heroes
         app.quarkus.io/vcs-uri: https://github.com/esara/quarkus-super-heroes.git
+        app.openshift.io/connects-to: "fights-kafka,apicurio,otel-collector"
         prometheus.io/scrape: "true"
         prometheus.io/path: /q/metrics
         prometheus.io/port: "8085"

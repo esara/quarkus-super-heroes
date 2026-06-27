@@ -3,11 +3,10 @@
 # ANY LOCAL CHANGES YOU MAKE SHOULD NOT BE COMMITTED TO SOURCE CONTROL.
 #######################################################################
 
-version: "3"
 services:
 
   fights-db:
-    image: mongo:7.0
+    image: mongo:8
     container_name: fights-db
     ports:
       - "27017"
@@ -19,7 +18,7 @@ services:
       - ../../rest-fights/deploy/db-init/initialize-database.js:/docker-entrypoint-initdb.d/1-init-db.js
 
   apicurio:
-    image: quay.io/apicurio/apicurio-registry-mem:2.6.5.Final
+    image: quay.io/apicurio/apicurio-registry:3.1.7
     container_name: apicurio
     ports:
       - "8086:8086"
@@ -28,22 +27,27 @@ services:
       QUARKUS_HTTP_PORT: 8086
 
   fights-kafka:
-    image: quay.io/strimzi/kafka:0.43.0-kafka-3.8.0
+    image: apache/kafka-native:4.2.0
     container_name: fights-kafka
     depends_on:
       - apicurio
-    command:
-      - "sh"
-      - "-c"
-      - "export CLUSTER_ID=$$(bin/kafka-storage.sh random-uuid) && bin/kafka-storage.sh format -t $${CLUSTER_ID} -c config/kraft/server.properties && bin/kafka-server-start.sh config/kraft/server.properties --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS}"
     ports:
       - "9092:9092"
     environment:
       LOG_DIR: /tmp/logs
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://fights-kafka:9092
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
 
   rest-fights-native:
-    image: quay.io/quarkus-super-heroes/rest-fights:native-latest
+    image: esara/rest-fights:native-latest
     container_name: rest-fights-native
     depends_on:
       - fights-db
@@ -79,7 +83,7 @@ services:
           cpus: '0.5'
 
   villains-db:
-    image: postgres:16
+    image: postgres:18
     container_name: villains-db
     ports:
       - "5432"
@@ -91,7 +95,7 @@ services:
       - ../../rest-villains/deploy/db-init/initialize-tables.sql:/docker-entrypoint-initdb.d/1-init-tables.sql
 
   heroes-db:
-    image: postgres:16
+    image: postgres:18
     container_name: heroes-db
     ports:
       - "5432"
@@ -117,7 +121,7 @@ services:
       - ../../grpc-locations/deploy/db-init/initialize-tables.sql:/docker-entrypoint-initdb.d/1-init-tables.sql
 
   rest-villains-native:
-    image: quay.io/quarkus-super-heroes/rest-villains:native-latest
+    image: esara/rest-villains:native-latest
     container_name: rest-villains-native
     depends_on:
       - villains-db
@@ -145,7 +149,7 @@ services:
           cpus: '0.5'
 
   rest-heroes-native:
-    image: quay.io/quarkus-super-heroes/rest-heroes:native-latest
+    image: esara/rest-heroes:native-latest
     container_name: rest-heroes-native
     depends_on:
       - heroes-db
@@ -173,7 +177,7 @@ services:
           cpus: '0.5'
 
   rest-narration-native:
-    image: quay.io/quarkus-super-heroes/rest-narration:native-latest
+    image: esara/rest-narration:native-latest
     container_name: rest-narration-native
     ports:
       - "8087:8087"
@@ -194,7 +198,7 @@ services:
           cpus: '0.5'
 
   grpc-locations-native:
-    image: quay.io/quarkus-super-heroes/grpc-locations:native-latest
+    image: esara/grpc-locations:native-latest
     container_name: grpc-locations-native
     depends_on:
       - locations-db
@@ -222,7 +226,7 @@ services:
           cpus: '0.5'
 
   event-statistics-native:
-    image: quay.io/quarkus-super-heroes/event-statistics:native-latest
+    image: esara/event-statistics:native-latest
     container_name: event-statistics-native
     depends_on:
       - apicurio
@@ -248,7 +252,7 @@ services:
           cpus: '0.5'
 
   ui-super-heroes-native:
-    image: quay.io/quarkus-super-heroes/ui-super-heroes:native-latest
+    image: esara/ui-super-heroes:native-latest
     container_name: ui-super-heroes
     ports:
       - "8080:8080"

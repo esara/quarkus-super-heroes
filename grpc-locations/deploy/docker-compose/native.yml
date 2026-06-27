@@ -3,7 +3,6 @@
 # ANY LOCAL CHANGES YOU MAKE SHOULD NOT BE COMMITTED TO SOURCE CONTROL.
 #######################################################################
 
-version: "3"
 services:
 
   locations-db:
@@ -21,7 +20,7 @@ services:
       - ../../../grpc-locations/deploy/db-init/initialize-tables.sql:/docker-entrypoint-initdb.d/1-init-tables.sql
 
   grpc-locations-native:
-    image: quay.io/quarkus-super-heroes/grpc-locations:native-latest
+    image: esara/grpc-locations:native-latest
     container_name: grpc-locations-native
     depends_on:
       - locations-db

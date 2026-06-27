@@ -1,6 +1,6 @@
 
   rest-narration-native:
-    image: quay.io/quarkus-super-heroes/rest-narration:native-latest
+    image: esara/rest-narration:native-latest
     container_name: rest-narration-native
     ports:
       - "8087:8087"

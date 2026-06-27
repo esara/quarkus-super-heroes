@@ -30,7 +30,7 @@ import io.smallrye.faulttolerance.api.CircuitBreakerState;
 import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
 
 /**
- * Tests for the {@link io.quarkus.sample.superheroes.fight.client.VillainClient}. Uses wiremock to stub responses and verify interactions.
+ * Tests for the {@link io.quarkus.workshop.superheroes.fight.client.VillainClient}. Uses wiremock to stub responses and verify interactions.
  * @see HeroesVillainsNarrationWiremockServerResource
  */
 @QuarkusTest

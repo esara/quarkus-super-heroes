@@ -1,6 +1,6 @@
 
   rest-fights-native:
-    image: quay.io/quarkus-super-heroes/rest-fights:native-latest
+    image: esara/rest-fights:native-latest
     container_name: rest-fights-native
     depends_on:
       - fights-db
