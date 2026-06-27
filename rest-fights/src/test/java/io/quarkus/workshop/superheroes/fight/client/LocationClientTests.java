@@ -73,6 +73,7 @@ class LocationClientTests {
 
 	@AfterEach
   void afterEach() {
+    // Reset all circuit breaker counts after each test
     this.circuitBreakerMaintenance.resetAll();
   }
 

@@ -3,11 +3,10 @@
 # ANY LOCAL CHANGES YOU MAKE SHOULD NOT BE COMMITTED TO SOURCE CONTROL.
 #######################################################################
 
-version: "3"
 services:
 
   heroes-db:
-    image: postgres:16
+    image: postgres:18
     container_name: heroes-db
     ports:
       - "5432"

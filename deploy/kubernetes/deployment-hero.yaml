@@ -13,6 +13,7 @@ metadata:
   labels:
     app.kubernetes.io/name: quarkus-workshop-hero
     app.kubernetes.io/part-of: heroes-service
+    app.kubernetes.io/version: native-latest
     app.kubernetes.io/managed-by: quarkus
   name: quarkus-workshop-heroes
 spec:
