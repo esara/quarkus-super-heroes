@@ -29,7 +29,6 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import io.quarkiverse.playwright.InjectPlaywright;
 import io.quarkiverse.playwright.WithPlaywright;
-import io.quarkiverse.quinoa.testing.QuinoaTestProfiles;
 import io.restassured.RestAssured;
 
 /**
@@ -39,87 +38,87 @@ import io.restassured.RestAssured;
  * The `Enable` test profile enables the Web UI (build and serve).
  */
 @QuarkusTest
-@TestProfile(QuinoaTestProfiles.Enable.class)
+@TestProfile(ITTestProfile.class)
 @WithPlaywright(recordVideoDir = "target/playwright", slowMo = 500)
 class WebUITests {
-	private static final String IMAGE_LOCATION_TEMPLATE = "https://raw.githubusercontent.com/esara/quarkus-super-heroes/characterdata/images/%s";
+  private static final String IMAGE_LOCATION_TEMPLATE = "https://raw.githubusercontent.com/esara/quarkus-super-heroes/characterdata/images/%s";
 
-	@InjectPlaywright
-	BrowserContext context;
+  @InjectPlaywright
+  BrowserContext context;
 
-	@Test
-	void webApplicationEndpoint() {
-		get("/").then()
+  @Test
+  void webApplicationEndpoint() {
+    get("/").then()
       .statusCode(OK.getStatusCode())
       .contentType(HTML)
       .body(matchesPattern(Pattern.compile(".*<div id=\"root\">.*", Pattern.DOTALL)));
-	}
+  }
 
-	@Test
-	void pageWorks() {
-		var page = loadPage();
+  @Test
+  void pageWorks() {
+    var page = loadPage();
 
-		fighterCardsOk(page);
-		locationCardsOk(page);
-		buttonsOk(page, false);
-		var table = tableOk(page);
+    fighterCardsOk(page);
+    locationCardsOk(page);
+    buttonsOk(page, false);
+    var table = tableOk(page);
 
     // Now click the fight button
     getFightButton(page).click();
 
-		page.waitForResponse(
-			successfulPostResponse("/api/fights"),
-			() -> performFightOk(page)
-		);
-	}
+    page.waitForResponse(
+      successfulPostResponse("/api/fights"),
+      () -> performFightOk(page)
+    );
+  }
 
-	private static Predicate<Response> successfulPostResponse(String uriPath) {
-		return response -> response.url().contains(uriPath) &&
-			(response.status() == OK.getStatusCode()) &&
-			HttpMethod.POST.equals(response.request().method());
-	}
+  private static Predicate<Response> successfulPostResponse(String uriPath) {
+    return response -> response.url().contains(uriPath) &&
+      (response.status() == OK.getStatusCode()) &&
+      HttpMethod.POST.equals(response.request().method());
+  }
 
-	private Page loadPage() {
-		var page = this.context.newPage();
-		var response = page.navigate("%s:%d".formatted(RestAssured.baseURI, RestAssured.port));
+  private Page loadPage() {
+    var page = this.context.newPage();
+    var response = page.navigate("%s:%d".formatted(RestAssured.baseURI, RestAssured.port));
 
-		assertThat(response).isNotNull()
+    assertThat(response).isNotNull()
       .extracting(Response::status)
       .isEqualTo(OK.getStatusCode());
 
-		page.waitForLoadState(LoadState.NETWORKIDLE);
+    page.waitForLoadState(LoadState.NETWORKIDLE);
 
-		PlaywrightAssertions.assertThat(page)
+    PlaywrightAssertions.assertThat(page)
       .hasTitle("SuperHeroes");
 
-		return page;
-	}
+    return page;
+  }
 
-	private Locator getTable(Page page) {
-		var table = page.getByRole(AriaRole.GRID);
+  private Locator getTable(Page page) {
+    var table = page.getByRole(AriaRole.GRID);
 
-		assertThat(table)
+    assertThat(table)
       .isNotNull();
 
-		table.scrollIntoViewIfNeeded();
+    table.scrollIntoViewIfNeeded();
 
-		PlaywrightAssertions.assertThat(table)
+    PlaywrightAssertions.assertThat(table)
       .isVisible();
 
-		return table;
-	}
+    return table;
+  }
 
-	private Locator getTableAndVerifyTable(Page page) {
-		var table = getTable(page);
+  private Locator getTableAndVerifyTable(Page page) {
+    var table = getTable(page);
 
-		assertThat(table.getByRole(AriaRole.ROW).count())
+    assertThat(table.getByRole(AriaRole.ROW).count())
       .isEqualTo(1);
 
-		return table;
-	}
+    return table;
+  }
 
-	private Locator tableOk(Page page) {
-		var table = getTableAndVerifyTable(page);
+  private Locator tableOk(Page page) {
+    var table = getTableAndVerifyTable(page);
     var tableCells = table.getByRole(AriaRole.ROW)
                           .all()
                           .getFirst()
@@ -152,137 +151,137 @@ class WebUITests {
       .satisfies(location -> assertThat(location).isEqualTo("Gotham City"), atIndex(2))
       .satisfies(locationUrl -> assertThat(locationUrl).isEqualTo(IMAGE_LOCATION_TEMPLATE.formatted("locations/gotham_city.jpg")), atIndex(3));
 
-		return table;
+    return table;
   }
 
-	private void fighterCardsOk(Page page) {
-		PlaywrightAssertions.assertThat(page.getByRole(AriaRole.HEADING, new GetByRoleOptions().setName("Luke Skywalker (Click for")))
-		                    .isVisible();
+  private void fighterCardsOk(Page page) {
+    PlaywrightAssertions.assertThat(page.getByRole(AriaRole.HEADING, new GetByRoleOptions().setName("Luke Skywalker (Click for more info)")))
+                        .isVisible();
 
-		var lukePicture = page.getByRole(AriaRole.IMG, new GetByRoleOptions().setName("the hero"));
-		PlaywrightAssertions.assertThat(lukePicture)
-		                    .isVisible();
+    var lukePicture = page.getByRole(AriaRole.IMG, new GetByRoleOptions().setName("the hero"));
+    PlaywrightAssertions.assertThat(lukePicture)
+                        .isVisible();
 
-		assertThat(lukePicture.getAttribute("src"))
+    assertThat(lukePicture.getAttribute("src"))
       .isEqualTo(IMAGE_LOCATION_TEMPLATE.formatted("luke-skywalker-2563509063968639219.jpg"));
 
-		PlaywrightAssertions.assertThat(page.locator(".hero-winner-card"))
-		                    .not().isVisible();
+    PlaywrightAssertions.assertThat(page.locator(".hero-winner-card"))
+                        .not().isVisible();
 
-		PlaywrightAssertions.assertThat(page.getByRole(AriaRole.HEADING, new GetByRoleOptions().setName("Darth Vader (Click for")))
-		                    .isVisible();
+    PlaywrightAssertions.assertThat(page.getByRole(AriaRole.HEADING, new GetByRoleOptions().setName("Darth Vader (Click for more info)")))
+                        .isVisible();
 
-		var darthPicture = page.getByRole(AriaRole.IMG, new GetByRoleOptions().setName("the villain"));
-		PlaywrightAssertions.assertThat(darthPicture)
-		                    .isVisible();
+    var darthPicture = page.getByRole(AriaRole.IMG, new GetByRoleOptions().setName("the villain"));
+    PlaywrightAssertions.assertThat(darthPicture)
+                        .isVisible();
 
-		assertThat(darthPicture.getAttribute("src"))
+    assertThat(darthPicture.getAttribute("src"))
       .isEqualTo(IMAGE_LOCATION_TEMPLATE.formatted("anakin-skywalker--8429855148488965479.jpg"));
 
-		PlaywrightAssertions.assertThat(page.locator(".villain-winner-card"))
-		                    .not().isVisible();
-	}
+    PlaywrightAssertions.assertThat(page.locator(".villain-winner-card"))
+                        .not().isVisible();
+  }
 
-	private void buttonsOk(Page page, boolean shouldNarrateBeVisible) {
-		PlaywrightAssertions.assertThat(page.getByText("NEW FIGHTERS"))
-		                    .isVisible();
+  private void buttonsOk(Page page, boolean shouldNarrateBeVisible) {
+    PlaywrightAssertions.assertThat(page.getByText("NEW FIGHTERS"))
+                        .isVisible();
 
-		PlaywrightAssertions.assertThat(page.getByText("NEW LOCATION"))
-		                    .isVisible();
+    PlaywrightAssertions.assertThat(page.getByText("NEW LOCATION"))
+                        .isVisible();
 
-		PlaywrightAssertions.assertThat(getFightButton(page))
-		                    .isVisible();
+    PlaywrightAssertions.assertThat(getFightButton(page))
+                        .isVisible();
 
-		var narrateButton = getNarrateButton(page);
-		assertThat(narrateButton)
-			.isNotNull();
+    var narrateButton = getNarrateButton(page);
+    assertThat(narrateButton)
+      .isNotNull();
 
-		if (shouldNarrateBeVisible) {
-			PlaywrightAssertions.assertThat(narrateButton)
-			                    .isVisible();
-		}
-		else {
-			PlaywrightAssertions.assertThat(narrateButton)
-				.not().isVisible();
-		}
-	}
+    if (shouldNarrateBeVisible) {
+      PlaywrightAssertions.assertThat(narrateButton)
+                          .isVisible();
+    }
+    else {
+      PlaywrightAssertions.assertThat(narrateButton)
+        .not().isVisible();
+    }
+  }
 
   private Locator getFightButton(Page page) {
     return page.getByText("FIGHT !");
   }
 
-	private Locator getNarrateButton(Page page) {
-		return page.getByText("NARRATE THE FIGHT");
-	}
+  private Locator getNarrateButton(Page page) {
+    return page.getByText("NARRATE THE FIGHT");
+  }
 
-	private void locationCardsOk(Page page) {
-		var locationPicture = page.getByRole(AriaRole.IMG, new GetByRoleOptions().setName("Location"));
-		PlaywrightAssertions.assertThat(locationPicture)
-		                    .isVisible();
+  private void locationCardsOk(Page page) {
+    var locationPicture = page.getByRole(AriaRole.IMG, new GetByRoleOptions().setName("Location"));
+    PlaywrightAssertions.assertThat(locationPicture)
+                        .isVisible();
 
-		assertThat(locationPicture.getAttribute("src"))
+    assertThat(locationPicture.getAttribute("src"))
       .isEqualTo(IMAGE_LOCATION_TEMPLATE.formatted("locations/gotham_city.jpg"));
 
-		var locationName = page.getByTestId("location-name");
-		PlaywrightAssertions.assertThat(locationName)
-		                    .isVisible();
+    var locationName = page.getByTestId("location-name");
+    PlaywrightAssertions.assertThat(locationName)
+                        .isVisible();
 
-		assertThat(locationName.textContent())
+    assertThat(locationName.textContent())
       .isEqualTo("Gotham City: ");
-	}
+  }
 
-	private void performFightOk(Page page) {
-		PlaywrightAssertions.assertThat(page.getByText("Winner is Luke Skywalker!"))
-				                    .isVisible();
+  private void performFightOk(Page page) {
+    PlaywrightAssertions.assertThat(page.getByText("Winner is Luke Skywalker!"))
+                            .isVisible();
 
-		// Verify the narrate button is there now
-		buttonsOk(page, true);
+    // Verify the narrate button is there now
+    buttonsOk(page, true);
 
-		var heroWinner = page.locator("div.hero-winner-card:not(.card-pf-body)");
-		PlaywrightAssertions.assertThat(heroWinner)
-		                    .isVisible();
+    var heroWinner = page.locator("div.hero-winner-card:not(.card-pf-body)");
+    PlaywrightAssertions.assertThat(heroWinner)
+                        .isVisible();
 
-		assertThat(heroWinner.count())
-			.isEqualTo(1);
+    assertThat(heroWinner.count())
+      .isEqualTo(1);
 
-		var narrateButton = getNarrateButton(page);
-		narrateButton.scrollIntoViewIfNeeded();
-		narrateButton.click();
+    var narrateButton = getNarrateButton(page);
+    narrateButton.scrollIntoViewIfNeeded();
+    narrateButton.click();
 
-		page.waitForResponse(
-			successfulPostResponse("/api/fights/narrate"),
-			() -> fightNarrationOk(page)
-		);
-	}
+    page.waitForResponse(
+      successfulPostResponse("/api/fights/narrate"),
+      () -> fightNarrationOk(page)
+    );
+  }
 
-	private void fightNarrationOk(Page page) {
-		PlaywrightAssertions.assertThat(page.getByText("This is the narration for the fight"))
-						                    .isVisible();
+  private void fightNarrationOk(Page page) {
+    PlaywrightAssertions.assertThat(page.getByText("This is the narration for the fight"))
+                                .isVisible();
 
-		var generateNarrationImageButton = page.getByRole(AriaRole.BUTTON, new GetByRoleOptions().setName("GENERATE NARRATION IMAGE"));
-		generateNarrationImageButton.scrollIntoViewIfNeeded();
+    var generateNarrationImageButton = page.getByRole(AriaRole.BUTTON, new GetByRoleOptions().setName("GENERATE NARRATION IMAGE"));
+    generateNarrationImageButton.scrollIntoViewIfNeeded();
 
-		PlaywrightAssertions.assertThat(generateNarrationImageButton)
-		                    .isVisible();
+    PlaywrightAssertions.assertThat(generateNarrationImageButton)
+                        .isVisible();
 
-		generateNarrationImageButton.click();
+    generateNarrationImageButton.click();
 
-		var narrationImage = page.waitForSelector("img[alt='Generated fight']");
-		narrationImageGenerationOk(page, narrationImage);
-	}
+    var narrationImage = page.waitForSelector("img[alt='Generated fight']");
+    narrationImageGenerationOk(page, narrationImage);
+  }
 
-	private void narrationImageGenerationOk(Page page, ElementHandle narrationImage) {
-		narrationImage.scrollIntoViewIfNeeded();
+  private void narrationImageGenerationOk(Page page, ElementHandle narrationImage) {
+    narrationImage.scrollIntoViewIfNeeded();
 
-		assertThat(narrationImage)
-			.isNotNull()
-			.extracting(
-				ElementHandle::isVisible,
-				element -> element.getAttribute("src")
-			)
-			.containsExactly(
-				true,
-				"https://dummyimage.com/240x320/1e8fff/ffffff&text=Fallback+Image"
-			);
-	}
+    assertThat(narrationImage)
+      .isNotNull()
+      .extracting(
+        ElementHandle::isVisible,
+        element -> element.getAttribute("src")
+      )
+      .containsExactly(
+        true,
+        "https://dummyimage.com/240x320/1e8fff/ffffff&text=Fallback+Image"
+      );
+  }
 }

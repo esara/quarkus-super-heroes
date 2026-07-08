@@ -1,6 +1,6 @@
 config:
 #  datasource:
-#    password: postgresql://superfight:superfight@fights:5432/fight,postgresql://superman:superman@heroes:5432/hero,postgresql://superbad:superbad@villains:5432/villain
+#    password: postgresql://superfight:superfight@super-dbs:5432/fight,postgresql://superlocation:superlocation@super-dbs:5432/locations,postgresql://superman:superman@super-dbs:5432/hero,postgresql://superbad:superbad@super-dbs:5432/villain
 
 # Specifies if datasource should be sourced from secret value in format: postgresql://login:password@hostname:port/dbname?sslmode=disable
 # Multiple Postgres databases can be configured by comma separated postgres connection strings
@@ -15,9 +15,9 @@ config:
 #kind: Secret
 #type: Opaque
 #metadata:
-#    name: prometheus-postgres-exporter
-#stringdData:
-#    data_source_name: postgresql://superfight:superfight@fights:5432/fight,postgresql://superman:superman@heroes:5432/hero,postgresql://superbad:superbad@villains:5432/villain
+#  name: prometheus-postgres-exporter
+#stringData:
+#  data_source_name: postgresql://superfight:superfight@super-dbs:5432/fight,postgresql://superlocation:superlocation@super-dbs:5432/locations,postgresql://superman:superman@super-dbs:5432/hero,postgresql://superbad:superbad@super-dbs:5432/villain
 
 service:
   port: 9187

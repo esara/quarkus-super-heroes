@@ -73,18 +73,17 @@ spec:
               path: /q/health/ready
               port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 10
           startupProbe:
             httpGet:
               path: /q/health/started
               port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 10
           resources:
             limits:
-              memory: 4Gi
+              memory: 2048Mi
             requests:
-              memory: 32Mi
+              cpu: 500m
+              memory: 128Mi
 ---
 apiVersion: v1
 kind: Service

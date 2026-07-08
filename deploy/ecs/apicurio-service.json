@@ -64,7 +64,7 @@
                 "ContainerDefinitions": [
                     {
                         "Name": "apicurio",
-                        "Image": "quay.io/apicurio/apicurio-registry-mem:latest-release",
+                        "Image": "quay.io/apicurio/apicurio-registry:3.1.7",
                         "Essential": true,
                         "PortMappings": [
                             { "ContainerPort": 8080, "Protocol": "tcp", "Name": "apicurio-port" }
