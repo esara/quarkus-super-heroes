@@ -90,6 +90,12 @@
       <version>${microcks.version}</version>
       <scope>provided</scope>
     </dependency>
+    <!-- Transitive quarkus-devservices for Microcks 0.5.0. A direct quarkus-devservices dependency fails generate-code. -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-datasource</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jacoco</artifactId>
